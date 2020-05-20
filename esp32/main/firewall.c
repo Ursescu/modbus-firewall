@@ -25,12 +25,13 @@ void app_main() {
     void *handler = NULL;
     mb_port_type_t port_type = MB_PORT_SERIAL_SLAVE;
 
-    ESP_ERROR_CHECK(mbc_firewall_init(port_type, &handler));
+    ESP_ERROR_CHECK(mbc_firewall_init(MB_PORT_SERIAL_FIREWALL, &handler));
     ESP_LOGI(TAG, "Firewall started\n");
 
     void *com_info = NULL;
 
-    ESP_ERROR_CHECK(mbc_firewall_setup(com_info));
+    /* No setup using the default */
+    // ESP_ERROR_CHECK(mbc_firewall_setup(com_info));
 
 
     ESP_ERROR_CHECK(mbc_firewall_start());

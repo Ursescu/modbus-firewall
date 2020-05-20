@@ -9,17 +9,20 @@
 #include "freertos/event_groups.h"  // for event groups
 #include "esp_modbus_common.h"      // for common types
 
+/* Need two UART ports to use firewall feature */
+#define MB_UART_PORT_IN (UART_NUM_MAX - 1)   // Default UART port number
+#define MB_UART_PORT_OUT (UART_NUM_MAX - 2)  // Default UART port number
 
-// /**
-//  * @brief Parameter access event information type
-//  */
-// typedef struct {
-//     uint32_t time_stamp;                    /*!< Timestamp of Modbus Event (uS)*/
-//     uint16_t mb_offset;                     /*!< Modbus register offset */
-//     mb_event_group_t type;                  /*!< Modbus event type */
-//     uint8_t* address;                       /*!< Modbus data storage address */
-//     size_t size;                            /*!< Modbus event register size (number of registers)*/
-// } mb_param_info_t;
+/**
+ * @brief Parameter access event information type
+ */
+typedef struct {
+    uint32_t time_stamp;                    /*!< Timestamp of Modbus Event (uS)*/
+    uint16_t mb_offset;                     /*!< Modbus register offset */
+    mb_event_group_t type;                  /*!< Modbus event type */
+    uint8_t* address;                       /*!< Modbus data storage address */
+    size_t size;                            /*!< Modbus event register size (number of registers)*/
+} mb_firewall_info_t;
 
 // /**
 //  * @brief Parameter storage area descriptor
@@ -72,8 +75,6 @@ esp_err_t mbc_firewall_start(void);
  */
 esp_err_t mbc_firewall_setup(void* comm_info);
 
-
-
 /**
  * @brief Wait for specific event on parameter change.
  *
@@ -107,7 +108,5 @@ esp_err_t mbc_firewall_setup(void* comm_info);
 //  *     - ESP_ERR_INVALID_ARG: The argument is incorrect
 //  */
 // esp_err_t mbc_slave_set_descriptor(mb_register_area_descriptor_t descr_data);
-
-
 
 #endif
