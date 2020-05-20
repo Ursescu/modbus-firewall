@@ -62,8 +62,10 @@ typedef enum
 {
     MB_PORT_SERIAL_MASTER = 0x00,   /*!< Modbus port type serial master. */
     MB_PORT_SERIAL_SLAVE,           /*!< Modbus port type serial slave. */
+    MB_PORT_SERIAL_FIREWALL,        /*!< Modbus port type serial firewall. */
     MB_PORT_TCP_MASTER,             /*!< Modbus port type TCP master. */
-    MB_PORT_TCP_SLAVE,               /*!< Modbus port type TCP slave. */
+    MB_PORT_TCP_SLAVE,              /*!< Modbus port type TCP slave. */
+    MB_PORT_TCP_FIREWALL,           /*!< Modbus port type TCP firewall. */
     MB_PORT_COUNT                   /*!< Modbus port count. */
 } mb_port_type_t;
 
