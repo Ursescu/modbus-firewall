@@ -1,6 +1,6 @@
 #include <sys/time.h>             // for calculation of time stamp in milliseconds
 #include "esp_log.h"              // for log_write
-#include "mb.h"                   // for mb types definition
+#include "mb_f.h"                   // for mb types definition
 #include "mbutils.h"              // for mbutils functions definition for stack callback
 #include "sdkconfig.h"            // for KConfig values
 #include "esp_modbus_common.h"    // for common defines
@@ -95,11 +95,11 @@ static esp_err_t mbc_serial_firewall_start(void)
     mb_firewall_options_t* mbf_opts = &mbf_interface_ptr->opts;
     eMBErrorCode status = MB_ENOERR;
     // Initialize Modbus stack using mbcontroller parameters
-    // status = eMBInit((eMBMode)mbs_opts->mbs_comm.mode,
-    //                      (UCHAR)mbs_opts->mbs_comm.slave_addr,
-    //                      (UCHAR)mbs_opts->mbs_comm.port,
-    //                      (ULONG)mbs_opts->mbs_comm.baudrate,
-    //                      (eMBParity)mbs_opts->mbs_comm.parity);
+    status = eMBFirewallInit((eMBMode)mbf_opts->mbf_comm_input.mode,
+                         (UCHAR)mbs_opts->mbs_comm.slave_addr,
+                         (UCHAR)mbs_opts->mbs_comm.port,
+                         (ULONG)mbs_opts->mbs_comm.baudrate,
+                         (eMBParity)mbs_opts->mbs_comm.parity);
 
     MB_FIREWALL_CHECK((status == MB_ENOERR), ESP_ERR_INVALID_STATE,
             "mb stack initialization failure, eMBFirewallInit() returns (0x%x).", status);
@@ -132,14 +132,14 @@ static esp_err_t mbc_serial_firewall_destroy(void)
                 ESP_ERR_INVALID_STATE, "mb stack stop event failure.");
 
     // Disable and then destroy the Modbus stack
-    // mb_error = eMBDisable();
+    mb_error = eMBFirewallDisable();
 
     MB_FIREWALL_CHECK((mb_error == MB_ENOERR), ESP_ERR_INVALID_STATE, "mb stack disable failure.");
     (void)vTaskDelete(mbf_opts->mbf_task_handle);
     (void)vQueueDelete(mbf_opts->mbf_notification_queue_handle);
     (void)vEventGroupDelete(mbf_opts->mbf_event_group);
 
-    // mb_error = eMBClose();
+    mb_error = eMBFirewallClose();
 
     MB_FIREWALL_CHECK((mb_error == MB_ENOERR), ESP_ERR_INVALID_STATE,
             "mb stack close failure returned (0x%x).", (uint32_t)mb_error);

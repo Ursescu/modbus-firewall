@@ -138,7 +138,7 @@ eMBFirewallRTUStart( void )
 }
 
 void
-eMBRTUStop( void )
+eMBFirewallRTUStop( void )
 {
     ENTER_CRITICAL_SECTION(  );
     vMBPortSerialEnable( FALSE, FALSE );
@@ -147,7 +147,7 @@ eMBRTUStop( void )
 }
 
 eMBErrorCode
-eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
+eMBFirewallRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
@@ -181,7 +181,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 }
 
 eMBErrorCode
-eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
+eMBFirewallRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
     USHORT          usCRC16;
@@ -220,7 +220,7 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
 }
 
 BOOL
-xMBRTUReceiveFSM( void )
+xMBFirewallRTUReceiveFSM( void )
 {
     BOOL            xTaskNeedSwitch = FALSE;
     UCHAR           ucByte;
@@ -280,7 +280,7 @@ xMBRTUReceiveFSM( void )
 }
 
 BOOL
-xMBRTUTransmitFSM( void )
+xMBFirewallRTUTransmitFSM( void )
 {
     BOOL xNeedPoll = FALSE;
 
@@ -318,7 +318,7 @@ xMBRTUTransmitFSM( void )
 }
 
 BOOL
-xMBRTUTimerT35Expired( void )
+xMBFirewallRTUTimerT35Expired( void )
 {
     BOOL            xNeedPoll = FALSE;
 
