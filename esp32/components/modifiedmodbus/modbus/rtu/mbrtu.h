@@ -35,7 +35,7 @@
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
-    eMBErrorCode eMBRTUInit( UCHAR slaveAddress, UCHAR ucPort, ULONG ulBaudRate,
+eMBErrorCode    eMBRTUInit( UCHAR slaveAddress, UCHAR ucPort, ULONG ulBaudRate,
                              eMBParity eParity );
 void            eMBRTUStart( void );
 void            eMBRTUStop( void );
@@ -55,6 +55,18 @@ eMBErrorCode    eMBMasterRTUSend( UCHAR slaveAddress, const UCHAR * pucFrame, US
 BOOL            xMBMasterRTUReceiveFSM( void );
 BOOL            xMBMasterRTUTransmitFSM( void );
 BOOL            xMBMasterRTUTimerExpired( void );
+#endif
+
+#if MB_FIREWALL_RTU_ENABLED > 0
+eMBErrorCode    eMBFirewallRTUInit( UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity );
+void            eMBFirewallRTUStart( void );
+void            eMBFirewallRTUStop( void );
+eMBErrorCode    eMBFirewallRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength );
+eMBErrorCode    eMBFirewallRTUSend( UCHAR slaveAddress, const UCHAR * pucFrame, USHORT usLength );
+BOOL            xMBFirewallRTUReceiveFSM( void );
+BOOL            xMBFirewallRTUTransmitFSM( void );
+BOOL            xMBFirewallRTUTimerExpired( void );
+
 #endif
 
 #ifdef __cplusplus

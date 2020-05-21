@@ -102,12 +102,12 @@ static esp_err_t mbc_serial_firewall_start(void)
     //                      (eMBParity)mbs_opts->mbs_comm.parity);
 
     MB_FIREWALL_CHECK((status == MB_ENOERR), ESP_ERR_INVALID_STATE,
-            "mb stack initialization failure, eMBInit() returns (0x%x).", status);
+            "mb stack initialization failure, eMBFirewallInit() returns (0x%x).", status);
 
-    // status = eMBEnable();
+    status = eMBFirewallEnable();
 
     MB_FIREWALL_CHECK((status == MB_ENOERR), ESP_ERR_INVALID_STATE,
-            "mb stack set slave ID failure, eMBEnable() returned (0x%x).", (uint32_t)status);
+            "mb stack set slave ID failure, eMBFirewallEnable() returned (0x%x).", (uint32_t)status);
 
     // Set the mbcontroller start flag
     EventBits_t flag = xEventGroupSetBits(mbf_opts->mbf_event_group,
