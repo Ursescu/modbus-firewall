@@ -133,6 +133,22 @@ BOOL            xMBMasterPortSerialGetByte( CHAR * pucByte );
 BOOL            xMBMasterPortSerialPutByte( CHAR ucByte );
 #endif
 
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+BOOL            xMBFirewallPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
+                                   UCHAR ucDataBits, eMBParity eParity );
+
+void            vMBFirewallPortClose( void );
+
+void            xMBFirewallPortSerialClose( void );
+
+void            vMBFirewallPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
+
+BOOL            xMBFirewallPortSerialGetByte( CHAR * pucByte );
+
+BOOL            xMBFirewallPortSerialPutByte( CHAR ucByte );
+
+#endif
+
 /* ----------------------- Timers functions ---------------------------------*/
 BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
 
