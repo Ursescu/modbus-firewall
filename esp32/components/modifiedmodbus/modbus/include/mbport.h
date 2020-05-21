@@ -134,18 +134,24 @@ BOOL            xMBMasterPortSerialPutByte( CHAR ucByte );
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-BOOL            xMBFirewallPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
-                                   UCHAR ucDataBits, eMBParity eParity );
+BOOL            xMBFirewallPortSerialInit( UCHAR ucPortInput, ULONG ulBaudRateInput,
+                                   UCHAR ucDataBitsInput, eMBParity eParityInput,
+                                   UCHAR ucPortOutput, ULONG ulBaudRateOutput,
+                                   UCHAR ucDataBitsOutput, eMBParity eParityOutput);
 
 void            vMBFirewallPortClose( void );
 
 void            xMBFirewallPortSerialClose( void );
 
-void            vMBFirewallPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
+void            vMBFirewallPortSerialEnable( BOOL xRxEnableInput, BOOL xTxEnableInput, BOOL xRxEnableOutput, BOOL xTxEnableOutput);
 
-BOOL            xMBFirewallPortSerialGetByte( CHAR * pucByte );
+BOOL            xMBFirewallInputPortSerialGetByte( CHAR * pucByte );
 
-BOOL            xMBFirewallPortSerialPutByte( CHAR ucByte );
+BOOL            xMBFirewallOutputPortSerialGetByte( CHAR * pucByte );
+
+BOOL            xMBFirewallInputPortSerialPutByte( CHAR ucByte );
+
+BOOL            xMBFirewallOutputPortSerialPutByte( CHAR ucByte );
 
 #endif
 
