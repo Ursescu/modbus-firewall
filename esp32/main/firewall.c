@@ -28,11 +28,14 @@ void app_main() {
     ESP_ERROR_CHECK(mbc_firewall_init(MB_PORT_SERIAL_FIREWALL, &handler));
     ESP_LOGI(TAG, "Firewall started\n");
 
-    void *com_info = NULL;
+    /* Setup the ports */
+    ESP_ERROR_CHECK(uart_set_pin(MB_PORT_NUM_IN, CONFIG_MB_FIREWALL_IN_UART_TXD, 
+                                    CONFIG_MB_FIREWALL_IN_UART_RXD, UART_PIN_NO_CHANGE, 
+                                    UART_PIN_NO_CHANGE));
 
-    /* No setup using the default */
-    // ESP_ERROR_CHECK(mbc_firewall_setup(com_info));
-
+    ESP_ERROR_CHECK(uart_set_pin(MB_PORT_NUM_IN, CONFIG_MB_FIREWALL_OUT_UART_TXD, 
+                                    CONFIG_MB_FIREWALL_OUT_UART_RXD, UART_PIN_NO_CHANGE, 
+                                    UART_PIN_NO_CHANGE));
 
     ESP_ERROR_CHECK(mbc_firewall_start());
 
