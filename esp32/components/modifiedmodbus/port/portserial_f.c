@@ -436,13 +436,13 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
 
     // Install UART INPUT driver, and get the queue.
     xErr = uart_driver_install(ucUartNumberInput, MB_SERIAL_BUF_SIZE, MB_SERIAL_BUF_SIZE,
-            MB_QUEUE_LENGTH, &xMbFirewallUartQueueInput, ESP_INTR_FLAG_LEVEL3);
+            MB_QUEUE_LENGTH, &xMbFirewallUartQueueInput, 0);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
             "mb input serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
 
     // Install UART OUTPUT driver, and get the queue.
     xErr = uart_driver_install(ucUartNumberOutput, MB_SERIAL_BUF_SIZE, MB_SERIAL_BUF_SIZE,
-            MB_QUEUE_LENGTH, &xMbFirewallUartQueueOutput, ESP_INTR_FLAG_LEVEL3);
+            MB_QUEUE_LENGTH, &xMbFirewallUartQueueOutput, 0);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
             "mb output serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
 
