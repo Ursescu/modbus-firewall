@@ -123,7 +123,7 @@ eMBFirewallRTUInit(UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityIn
              */
             usTimerT35_50us = ( 7UL * 220000UL ) / ( 2UL * ulBaudRateInput );
         }
-        if( xMBPortTimersInit( ( USHORT ) usTimerT35_50us ) != TRUE )
+        if( xMBFirewallPortTimersInit( ( USHORT ) usTimerT35_50us ) != TRUE )
         {
             eStatus = MB_EPORTERR;
         }
@@ -144,7 +144,7 @@ eMBFirewallRTUStart( void )
      */
     eRcvStateInput = STATE_RX_INIT;
     vMBFirewallPortSerialEnable( TRUE, FALSE, FALSE, FALSE);
-    vMBPortTimersEnable(  );
+    vMBFirewallPortTimersEnable(  );
 
     EXIT_CRITICAL_SECTION(  );
 }
@@ -154,7 +154,7 @@ eMBFirewallRTUStop( void )
 {
     ENTER_CRITICAL_SECTION(  );
     vMBFirewallPortSerialEnable( FALSE, FALSE, FALSE, FALSE);
-    vMBPortTimersDisable(  );
+    vMBFirewallPortTimersDisable(  );
     EXIT_CRITICAL_SECTION(  );
 }
 
@@ -221,7 +221,7 @@ eMBFirewallInputRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT us
 
         /* Activate the transmitter. */
         eSndStateInput = STATE_TX_XMIT;
-        vMBPortSerialEnable( FALSE, TRUE );
+        vMBFirewallPortSerialEnable( FALSE, TRUE, FALSE, FALSE );
     }
     else
     {
@@ -248,14 +248,14 @@ xMBFirewallInputRTUReceiveFSM( void )
          * wait until the frame is finished.
          */
     case STATE_RX_INIT:
-        vMBPortTimersEnable(  );
+        vMBFirewallPortTimersEnable(  );
         break;
 
         /* In the error state we wait until all characters in the
          * damaged frame are transmitted.
          */
     case STATE_RX_ERROR:
-        vMBPortTimersEnable(  );
+        vMBFirewallPortTimersEnable(  );
         break;
 
         /* In the idle state we wait for a new character. If a character
@@ -268,7 +268,7 @@ xMBFirewallInputRTUReceiveFSM( void )
         eRcvStateInput = STATE_RX_RCV;
 
         /* Enable t3.5 timers. */
-        vMBPortTimersEnable(  );
+        vMBFirewallPortTimersEnable(  );
         break;
 
         /* We are currently receiving a frame. Reset the timer after
@@ -285,7 +285,7 @@ xMBFirewallInputRTUReceiveFSM( void )
         {
             eRcvStateInput = STATE_RX_ERROR;
         }
-        vMBPortTimersEnable(  );
+        vMBFirewallPortTimersEnable(  );
         break;
     }
     return xTaskNeedSwitch;
@@ -304,14 +304,14 @@ xMBFirewallInputRTUTransmitFSM( void )
          * idle state.  */
     case STATE_TX_IDLE:
         /* enable receiver/disable transmitter. */
-        vMBPortSerialEnable( TRUE, FALSE );
+        vMBFirewallPortSerialEnable( TRUE, FALSE, FALSE, FALSE );
         break;
 
     case STATE_TX_XMIT:
         /* check if we are finished. */
         if( usSndBufferCountInput != 0 )
         {
-            xMBPortSerialPutByte( ( CHAR )*pucSndBufferCurInput );
+            xMBFirewallInputPortSerialPutByte( ( CHAR )*pucSndBufferCurInput );
             pucSndBufferCurInput++;  /* next byte in sendbuffer. */
             usSndBufferCountInput--;
         }
@@ -320,7 +320,7 @@ xMBFirewallInputRTUTransmitFSM( void )
             xNeedPoll = xMBPortEventPost( EV_FRAME_SENT );
             /* Disable transmitter. This prevents another transmit buffer
              * empty interrupt. */
-            vMBPortSerialEnable( TRUE, FALSE );
+            vMBFirewallPortSerialEnable( TRUE, FALSE, FALSE, FALSE);
             eSndStateInput = STATE_TX_IDLE;
         }
         break;
@@ -357,7 +357,7 @@ xMBFirewallInputRTUTimerT35Expired( void )
                 ( eRcvStateInput == STATE_RX_RCV ) || ( eRcvStateInput == STATE_RX_ERROR ) );
     }
 
-    vMBPortTimersDisable(  );
+    vMBFirewallPortTimersDisable(  );
     eRcvStateInput = STATE_RX_IDLE;
 
     return xNeedPoll;

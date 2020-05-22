@@ -180,6 +180,18 @@ void            vMBMasterPortTimersRespondTimeoutEnable( void );
 void            vMBMasterPortTimersDisable( void );
 #endif
 
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+BOOL            xMBFirewallPortTimersInit( USHORT usTimeOut50us );
+
+void            xMBFirewallPortTimersClose( void );
+
+void            vMBFirewallPortTimersEnable( void );
+
+void            vMBFirewallPortTimersDisable( void );
+
+void            vMBFirewallPortTimersDelay( USHORT usTimeOutMS );
+#endif
+
 /* ----------------- Callback for the master error process ------------------*/
 void            vMBMasterErrorCBRespondTimeout( UCHAR ucDestAddress, const UCHAR* pucPDUData,
                                                 USHORT ucPDULength );

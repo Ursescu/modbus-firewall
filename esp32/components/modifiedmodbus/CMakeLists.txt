@@ -23,6 +23,7 @@ set(srcs
     "port/portserial_f.c"
     "port/porttimer.c"
     "port/porttimer_m.c"
+    "port/porttimer_f.c"
     "modbus/functions/mbfunccoils.c"
     "modbus/functions/mbfunccoils_m.c"
     "modbus/functions/mbfuncdiag.c"
