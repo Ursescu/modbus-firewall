@@ -332,7 +332,8 @@ static void vUartTaskOutput(void *pvParameters)
 
 
 BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
-                        UCHAR ucDataBitsInput, eMBParity eParityInput,UCHAR ucPORTOutput, ULONG ulBaudRateOutput,
+                        UCHAR ucDataBitsInput, eMBParity eParityInput,
+                        UCHAR ucPORTOutput, ULONG ulBaudRateOutput,
                         UCHAR ucDataBitsOutput, eMBParity eParityOutput)
 {
     esp_err_t xErr = ESP_OK;
@@ -340,6 +341,8 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
     MB_PORT_CHECK((eParityOutput <= MB_PAR_EVEN), FALSE, "mb serial set parity for output failed.");
     // Set communication port number
     ucUartNumberInput = ucPORTInput;
+    ucUartNumberOutput = ucPORTOutput;
+ 
     // Configure serial communication parameters
     UCHAR ucParityInput = UART_PARITY_DISABLE;
     UCHAR ucDataInput = UART_DATA_8_BITS;
