@@ -21,7 +21,10 @@ static void modbus_firewall_task(void *pvParameters)
     
     MB_FIREWALL_ASSERT(mbf_opts != NULL);
 
-    // Main Modbus stack processing cycle
+
+    printf("Internal task for firewall started\n");
+
+    // Main Modbus Firewall stack processing cycle
     for (;;) {
         BaseType_t status = xEventGroupWaitBits(mbf_opts->mbf_event_group,
                                                 (BaseType_t)(MB_EVENT_STACK_STARTED),
@@ -30,7 +33,9 @@ static void modbus_firewall_task(void *pvParameters)
                                                 portMAX_DELAY);
         // Check if stack started then poll for data
         if (status & MB_EVENT_STACK_STARTED) {
-            printf("Internal task for firewall started\n");
+            printf("Iteration for the main task\n");
+            /* Simulate some waiting here - get the main task some CPU time*/ 
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
             // (void)eMBPoll(); // allow stack to process data
             // (void)xMBPortSerialTxPoll(); // Send response buffer if ready
         }
