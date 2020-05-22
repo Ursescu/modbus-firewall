@@ -217,6 +217,17 @@ extern          BOOL( *pxMBMasterFrameCBTransmitterEmpty ) ( void );
 
 extern          BOOL( *pxMBMasterPortCBTimerExpired ) ( void );
 #endif
+
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+extern          BOOL( *pxMBFirewallInputFrameCBByteReceived ) ( void );
+extern          BOOL( *pxMBFirewallOutputFrameCBByteReceived ) ( void );
+
+extern          BOOL( *pxMBFirewallInputFrameCBTransmitterEmpty ) ( void );
+extern          BOOL( *pxMBFirewallOutputFrameCBTransmitterEmpty ) ( void );
+
+extern          BOOL( *pxMBFirewallInputPortCBTimerExpired ) ( void );
+extern          BOOL( *pxMBFirewallOutputPortCBTimerExpired ) ( void );
+#endif
 /* ----------------------- TCP port functions -------------------------------*/
 #if MB_TCP_ENABLED
 BOOL            xMBTCPPortInit( USHORT usTCPPort );
