@@ -1,6 +1,6 @@
 menu "Modbus Firewall Example Configuration"
 
-    config MB_IN_UART_RXD
+    config MB_FIREWALL_IN_UART_RXD
         int "UART RXD in pin number"
         range 0 34
         default 22
@@ -8,7 +8,7 @@ menu "Modbus Firewall Example Configuration"
             GPIO number for UART RX pin. See UART documentation for more information
             about available pin numbers for UART.
 
-    config MB_IN_UART_TXD
+    config MB_FIREWALL_IN_UART_TXD
         int "UART TXD in pin number"
         range 0 34
         default 23
@@ -16,14 +16,14 @@ menu "Modbus Firewall Example Configuration"
             GPIO number for UART TX pin. See UART documentation for more information
             about available pin numbers for UART.
 
-    config MB_OUT_UART_TXD
+    config MB_FIREWALL_OUT_UART_TXD
         int "UART TXD out pin number"
         range 0 34
         default 25
         help
             GPIO number for UART out TX pin.
     
-    config MB_OUT_UART_RXD
+    config MB_FIREWALL_OUT_UART_RXD
         int "UART RXD out pin number"
         range 0 34
         default 26
