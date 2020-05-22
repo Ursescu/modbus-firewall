@@ -32,6 +32,7 @@
 #define _MB_F_H
 
 #include "port.h"
+#include "mbconfig.h"
 
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
@@ -40,12 +41,11 @@ PR_BEGIN_EXTERN_C
 #include "mbport.h"
 #include "mbproto.h"
 
-#define MB_FIREWALL_TCP_PORT_USE_DEFAULT 0   
+#define MB_FIREWALL_TCP_PORT_USE_DEFAULT 0
 
 /* ----------------------- Type definitions ---------------------------------*/
 
-#if !(defined (_MB_M_H) || defined (_MB_H))
-
+#if !defined(_MB_M_H) && !defined(_MB_H)
 
 typedef enum {
     MB_RTU,   /*!< RTU transmission mode. */
@@ -53,35 +53,33 @@ typedef enum {
     MB_TCP    /*!< TCP mode. */
 } eMBMode;
 
-
 typedef enum {
     MB_REG_READ, /*!< Read register values and pass to protocol stack. */
     MB_REG_WRITE /*!< Update register values. */
 } eMBRegisterMode;
 
 typedef enum {
-    MB_ENOERR,                  /*!< no error. */
-    MB_ENOREG,                  /*!< illegal register address. */
-    MB_EINVAL,                  /*!< illegal argument. */
-    MB_EPORTERR,                /*!< porting layer error. */
-    MB_ENORES,                  /*!< insufficient resources. */
-    MB_EIO,                     /*!< I/O error. */
-    MB_EILLSTATE,               /*!< protocol stack in illegal state. */
-    MB_ETIMEDOUT                /*!< timeout error occurred. */
+    MB_ENOERR,    /*!< no error. */
+    MB_ENOREG,    /*!< illegal register address. */
+    MB_EINVAL,    /*!< illegal argument. */
+    MB_EPORTERR,  /*!< porting layer error. */
+    MB_ENORES,    /*!< insufficient resources. */
+    MB_EIO,       /*!< I/O error. */
+    MB_EILLSTATE, /*!< protocol stack in illegal state. */
+    MB_ETIMEDOUT  /*!< timeout error occurred. */
 } eMBErrorCode;
-
 #endif
 
-eMBErrorCode    eMBFirewallInit( eMBMode eMode,
-                         UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity );
+eMBErrorCode eMBFirewallInit(eMBMode eMode, UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityInput,
+                             UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput);
 
-eMBErrorCode    eMBFirewallTCPInit( USHORT usTCPPort );
+eMBErrorCode eMBFirewallTCPInit(USHORT usTCPPort);
 
-eMBErrorCode    eMBFirewallClose( void );
+eMBErrorCode eMBFirewallClose(void);
 
-eMBErrorCode    eMBFirewallEnable( void );
+eMBErrorCode eMBFirewallEnable(void);
 
-eMBErrorCode    eMBFirewallDisable( void );
+eMBErrorCode eMBFirewallDisable(void);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

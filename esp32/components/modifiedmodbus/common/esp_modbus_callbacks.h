@@ -20,6 +20,7 @@
 
 #include "mb.h"
 #include "mb_m.h"
+#include "mb_f.h"
 
 typedef eMBErrorCode (*reg_input_cb)(UCHAR*, USHORT, USHORT);
 typedef eMBErrorCode (*reg_holding_cb)(UCHAR*, USHORT, USHORT, eMBRegisterMode);

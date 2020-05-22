@@ -74,7 +74,7 @@ PR_BEGIN_EXTERN_C
 #define MB_TCP_PORT_USE_DEFAULT 0   
 
 /* ----------------------- Type definitions ---------------------------------*/
-#ifndef _MB_M_H
+#if !defined(_MB_M_H) && !defined(_MB_F_H)
 
 /*! \ingroup modbus
  * \brief Modbus serial transmission modes (RTU/ASCII).

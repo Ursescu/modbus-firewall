@@ -147,20 +147,20 @@ static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize)
             
             // TODO 
             /* MB frame callback logic need to be reimplemented */
-            // for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
-            //     // Call the Modbus stack callback function and let it fill the buffers.
-            //     ( void )pxMBFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
-            // }
+            for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
+                // Call the Modbus stack callback function and let it fill the buffers.
+                ( void )pxMBFirewallInputFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
+            }
 
             // The buffer is transferred into Modbus stack and is not needed here any more
             uart_flush_input(ucUartNumberInput);
     
             // TODO
-//             // Send event EV_FRAME_RECEIVED to allow stack process packet
-// #ifndef MB_TIMER_PORT_ENABLED
-//             // Let the stack know that T3.5 time is expired and data is received
-//             (void)pxMBPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
-// #endif
+            // Send event EV_FRAME_RECEIVED to allow stack process packet
+#ifndef MB_TIMER_PORT_ENABLED
+            // Let the stack know that T3.5 time is expired and data is received
+            (void)pxMBFirewallInputFrameCBByteReceived(); // calls callback xMBRTUTimerT35Expired();
+#endif
             ESP_LOGD(TAG, "RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
         }
     }
@@ -209,7 +209,7 @@ BOOL xMBFirewallInputPortSerialTxPoll()
         // TODO - rewrite logic here
         while((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
-            bNeedPoll = pxMBFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
+            bNeedPoll = pxMBFirewallInputFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
         }
         ESP_LOGD(TAG, "MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;
@@ -228,7 +228,7 @@ BOOL xMBFirewallOutputPortSerialTxPoll()
         // TODO - rewrite logic here
         while((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
-            bNeedPoll = pxMBFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
+            // bNeedPoll = pxMBFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
         }
         ESP_LOGD(TAG, "MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;

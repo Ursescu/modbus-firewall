@@ -73,7 +73,7 @@ PR_BEGIN_EXTERN_C
  */
 #define MB_MASTER_TCP_PORT_USE_DEFAULT 0
 
-#ifndef _MB_H
+#if !defined(_MB_H) && !defined(_MB_F_H)
 
 /* ----------------------- Type definitions ---------------------------------*/
 /*! \ingroup modbus

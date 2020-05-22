@@ -96,10 +96,12 @@ static esp_err_t mbc_serial_firewall_start(void)
     eMBErrorCode status = MB_ENOERR;
     // Initialize Modbus stack using mbcontroller parameters
     status = eMBFirewallInit((eMBMode)mbf_opts->mbf_comm_input.mode,
-                         (UCHAR)mbs_opts->mbs_comm.slave_addr,
-                         (UCHAR)mbs_opts->mbs_comm.port,
-                         (ULONG)mbs_opts->mbs_comm.baudrate,
-                         (eMBParity)mbs_opts->mbs_comm.parity);
+                         (UCHAR)mbf_opts->mbf_comm_input.port,
+                         (UCHAR)mbf_opts->mbf_comm_input.baudrate,
+                         (ULONG)mbf_opts->mbf_comm_input.parity,
+                         (UCHAR)mbf_opts->mbf_comm_output.port,
+                         (UCHAR)mbf_opts->mbf_comm_output.baudrate,
+                         (ULONG)mbf_opts->mbf_comm_output.parity);
 
     MB_FIREWALL_CHECK((status == MB_ENOERR), ESP_ERR_INVALID_STATE,
             "mb stack initialization failure, eMBFirewallInit() returns (0x%x).", status);

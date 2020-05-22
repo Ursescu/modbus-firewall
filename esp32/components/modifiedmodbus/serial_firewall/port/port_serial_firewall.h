@@ -56,7 +56,7 @@
 PR_BEGIN_EXTERN_C
 #endif /* __cplusplus */
 
-BOOL xMBPortSerialTxPoll( void );
+// BOOL xMBPortSerialTxPoll( void );
 
 void vMBPortSetMode( UCHAR ucMode );
 
