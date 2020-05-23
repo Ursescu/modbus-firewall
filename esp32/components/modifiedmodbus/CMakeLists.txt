@@ -16,6 +16,7 @@ set(srcs
     "port/port.c"
     "port/portevent.c"
     "port/portevent_m.c"
+    "port/portevent_f.c"
     "port/portother.c"
     "port/portother_m.c"
     "port/portserial.c"

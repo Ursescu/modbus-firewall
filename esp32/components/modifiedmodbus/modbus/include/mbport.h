@@ -103,6 +103,15 @@ BOOL            xMBMasterRunResTake( LONG time );
 
 void            vMBMasterRunResRelease( void );
 #endif // #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
+
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+BOOL            xMBFirewallPortEventInit( void );
+
+BOOL            xMBFirewallPortEventPost( eMBFirewallEventType eEvent );
+
+BOOL            xMBFirewallPortEventGet( eMBFirewallEventType * eEvent );
+#endif
+
 /* ----------------------- Serial port functions ----------------------------*/
 
 BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
