@@ -152,7 +152,9 @@ void            vMBFirewallPortClose( void );
 
 void            xMBFirewallPortSerialClose( void );
 
-void            vMBFirewallPortSerialEnable( BOOL xRxEnableInput, BOOL xTxEnableInput, BOOL xRxEnableOutput, BOOL xTxEnableOutput);
+void            vMBFirewallInputPortSerialEnable( BOOL xRxEnableInput, BOOL xTxEnableInput);
+
+void            vMBFirewallOutputPortSerialEnable(BOOL xRxEnableOutput, BOOL xTxEnableOutput);
 
 BOOL            xMBFirewallInputPortSerialGetByte( CHAR * pucByte );
 

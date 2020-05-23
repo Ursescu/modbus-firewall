@@ -99,9 +99,7 @@ static UCHAR ucBufferOutput[MB_SERIAL_BUF_SIZE]; // Temporary buffer to transfer
 static USHORT uiRxBufferPosInput = 0;    // position in the receiver buffer
 static USHORT uiRxBufferPosOutput = 0;    // position in the receiver buffer
 
-void vMBFirewallPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput,
-                                BOOL bRxEnableOutput, BOOL bTxEnableOutput)
-{
+void vMBFirewallInputPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput) {
     // This function can be called from xMBRTUTransmitFSM() of different task
     if (bRxEnableInput) {
 
@@ -111,7 +109,16 @@ void vMBFirewallPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput,
         vTaskSuspend(xMbFirewallTaskHandleInput); // Block receiver task
         bRxStateEnabledInput = FALSE;
     }
+    if (bTxEnableInput) {
+        bTxStateEnabledInput = TRUE;
+    } else {
+        bTxStateEnabledInput = FALSE;
+    }
+}
 
+
+void vMBFirewallOutputPortSerialEnable(BOOL bRxEnableOutput, BOOL bTxEnableOutput)
+{
     if (bRxEnableOutput) {
 
         bRxStateEnabledOutput = TRUE;
@@ -120,11 +127,6 @@ void vMBFirewallPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput,
     else {
         vTaskSuspend(xMbFirewallTaskHandleOutput); // Block receiver task
         bRxStateEnabledOutput = FALSE;
-    }
-    if (bTxEnableInput) {
-        bTxStateEnabledInput = TRUE;
-    } else {
-        bTxStateEnabledInput = FALSE;
     }
 
     if (bTxEnableOutput) {
