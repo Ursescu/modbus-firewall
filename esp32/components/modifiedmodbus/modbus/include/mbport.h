@@ -69,6 +69,21 @@ typedef enum {
 } eMBMasterErrorEventType;
 #endif
 
+#if MB_FIREWALL_RTU_ENABLED > 0 || MB_FIREWALL_ASCII_ENABLED > 0
+typedef enum
+{
+    EV_F_READY = 0x01,                   /*!< Startup finished. */
+    EV_F_INPUT_FRAME_RECEIVED = 0x02,          /*!< Frame received. */
+    EV_F_INPUT_EXECUTE = 0x04,                 /*!< Execute function. */
+    EV_F_INPUT_FRAME_SENT = 0x08,               /*!< Frame sent. */
+    EV_F_OUTPUT_FRAME_RECEIVED = 0x10,          /*!< Frame received. */
+    EV_F_OUTPUT_EXECUTE = 0x12,                 /*!< Execute function. */
+    EV_F_OUTPUT_FRAME_SENT = 0x14               /*!< Frame sent. */
+
+} eMBFirewallEventType;
+
+#endif 
+
 /*! \ingroup modbus
  * \brief Parity used for characters in serial mode.
  *
@@ -192,15 +207,23 @@ void            vMBMasterPortTimersDisable( void );
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-BOOL            xMBFirewallPortTimersInit( USHORT usTimeOut50us );
+BOOL            xMBFirewallPortTimersInit( USHORT usTimeOut50usInput, USHORT usTimeOut50usOutput);
 
-void            xMBFirewallPortTimersClose( void );
+void            xMBFirewallInputPortTimersClose( void );
 
-void            vMBFirewallPortTimersEnable( void );
+void            xMBFirewallOutputPortTimersClose( void );
 
-void            vMBFirewallPortTimersDisable( void );
+void            vMBFirewallInputPortTimersEnable( void );
 
-void            vMBFirewallPortTimersDelay( USHORT usTimeOutMS );
+void            vMBFirewallOutputPortTimersEnable( void );
+
+void            vMBFirewallInputPortTimersDisable( void );
+
+void            vMBFirewallOutputPortTimersDisable( void );
+
+void            vMBFirewallInputPortTimersDelay( USHORT usTimeOutMS );
+
+void            vMBFirewallOutputPortTimersDelay( USHORT usTimeOutMS );
 #endif
 
 /* ----------------- Callback for the master error process ------------------*/

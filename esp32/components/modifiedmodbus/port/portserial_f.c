@@ -147,7 +147,6 @@ static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize)
             // Get received packet into Rx buffer
             usLength = uart_read_bytes(ucUartNumberInput, &ucBufferInput[uiRxBufferPosInput], xEventSize, portMAX_DELAY);
             
-            // TODO 
             /* MB frame callback logic need to be reimplemented */
             for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
                 // Call the Modbus stack callback function and let it fill the buffers.
@@ -156,14 +155,13 @@ static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize)
 
             // The buffer is transferred into Modbus stack and is not needed here any more
             uart_flush_input(ucUartNumberInput);
-    
-            // TODO
+
             // Send event EV_FRAME_RECEIVED to allow stack process packet
 #ifndef MB_TIMER_PORT_ENABLED
             // Let the stack know that T3.5 time is expired and data is received
-            (void)pxMBFirewallInputFrameCBByteReceived(); // calls callback xMBRTUTimerT35Expired();
+            (void)pxMBFirewallInputPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
 #endif
-            ESP_LOGD(TAG, "RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
+            ESP_LOGD(TAG, "INPUT_RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
         }
     }
 }
@@ -179,23 +177,21 @@ static void vMBFirewallOutputPortSerialRxPoll(size_t xEventSize)
             // Get received packet into Rx buffer
             usLength = uart_read_bytes(ucUartNumberOutput, &ucBufferOutput[uiRxBufferPosOutput], xEventSize, portMAX_DELAY);
             
-            // TODO 
             /* MB frame callback logic need to be reimplemented */
-            // for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
-            //     // Call the Modbus stack callback function and let it fill the buffers.
-            //     ( void )pxMBFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
-            // }
+            for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
+                // Call the Modbus stack callback function and let it fill the buffers.
+                ( void )pxMBFirewallOutputFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
+            }
 
             // The buffer is transferred into Modbus stack and is not needed here any more
             uart_flush_input(ucUartNumberOutput);
-    
-            // TODO
-//             // Send event EV_FRAME_RECEIVED to allow stack process packet
-// #ifndef MB_TIMER_PORT_ENABLED
-//             // Let the stack know that T3.5 time is expired and data is received
-//             (void)pxMBPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
-// #endif
-            ESP_LOGD(TAG, "RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
+
+            // Send event EV_FRAME_RECEIVED to allow stack process packet
+#ifndef MB_TIMER_PORT_ENABLED
+            // Let the stack know that T3.5 time is expired and data is received
+            (void)pxMBFirewallOutputPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
+#endif
+            ESP_LOGD(TAG, "OUTPUT_RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
         }
     }
 }
@@ -213,7 +209,7 @@ BOOL xMBFirewallInputPortSerialTxPoll()
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
             bNeedPoll = pxMBFirewallInputFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
         }
-        ESP_LOGD(TAG, "MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
+        ESP_LOGD(TAG, "INPUT_MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;
     }
     return bStatus;
@@ -230,9 +226,9 @@ BOOL xMBFirewallOutputPortSerialTxPoll()
         // TODO - rewrite logic here
         while((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
-            // bNeedPoll = pxMBFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
+            bNeedPoll = pxMBFirewallOutputFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
         }
-        ESP_LOGD(TAG, "MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
+        ESP_LOGD(TAG, "OUTPUT_MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;
     }
     return bStatus;
@@ -244,40 +240,40 @@ static void vUartTaskInput(void *pvParameters)
     uart_event_t xEvent;
     for(;;) {
         if (xQueueReceive(xMbFirewallUartQueueInput, (void*)&xEvent, portMAX_DELAY) == pdTRUE) {
-            ESP_LOGD(TAG, "MB_uart[%d] event:", ucUartNumberInput);
+            ESP_LOGD(TAG, "INPUT_MB_uart[%d] event:", ucUartNumberInput);
             //vMBPortTimersEnable();
             switch(xEvent.type) {
                 //Event of UART receving data
                 case UART_DATA:
-                    ESP_LOGD(TAG,"Receive data, len: %d", xEvent.size);
+                    ESP_LOGD(TAG,"INPUT Receive data, len: %d", xEvent.size);
                     // Read received data and send it to modbus stack
                     vMBFirewallInputPortSerialRxPoll(xEvent.size);
                     break;
                 //Event of HW FIFO overflow detected
                 case UART_FIFO_OVF:
-                    ESP_LOGD(TAG, "hw fifo overflow\n");
+                    ESP_LOGD(TAG, "INPUT hw fifo overflow\n");
                     xQueueReset(xMbFirewallUartQueueInput);
                     break;
                 //Event of UART ring buffer full
                 case UART_BUFFER_FULL:
-                    ESP_LOGD(TAG, "ring buffer full\n");
+                    ESP_LOGD(TAG, "INPUT ring buffer full\n");
                     xQueueReset(xMbFirewallUartQueueInput);
                     uart_flush_input(ucUartNumberInput);
                     break;
                 //Event of UART RX break detected
                 case UART_BREAK:
-                    ESP_LOGD(TAG, "uart rx break\n");
+                    ESP_LOGD(TAG, "INPUT uart rx break\n");
                     break;
                 //Event of UART parity check error
                 case UART_PARITY_ERR:
-                    ESP_LOGD(TAG, "uart parity error\n");
+                    ESP_LOGD(TAG, "INPUT uart parity error\n");
                     break;
                 //Event of UART frame error
                 case UART_FRAME_ERR:
-                    ESP_LOGD(TAG, "uart frame error\n");
+                    ESP_LOGD(TAG, "INPUT uart frame error\n");
                     break;
                 default:
-                    ESP_LOGD(TAG, "uart event type: %d\n", xEvent.type);
+                    ESP_LOGD(TAG, "INPUT uart event type: %d\n", xEvent.type);
                     break;
             }
         }
@@ -291,40 +287,40 @@ static void vUartTaskOutput(void *pvParameters)
     uart_event_t xEvent;
     for(;;) {
         if (xQueueReceive(xMbFirewallUartQueueOutput, (void*)&xEvent, portMAX_DELAY) == pdTRUE) {
-            ESP_LOGD(TAG, "MB_uart[%d] event:", ucUartNumberOutput);
+            ESP_LOGD(TAG, "OUTPUT_MB_uart[%d] event:", ucUartNumberOutput);
             //vMBPortTimersEnable();
             switch(xEvent.type) {
                 //Event of UART receving data
                 case UART_DATA:
-                    ESP_LOGD(TAG,"Receive data, len: %d", xEvent.size);
+                    ESP_LOGD(TAG,"OUTPUT Receive data, len: %d", xEvent.size);
                     // Read received data and send it to modbus stack
                     vMBFirewallOutputPortSerialRxPoll(xEvent.size);
                     break;
                 //Event of HW FIFO overflow detected
                 case UART_FIFO_OVF:
-                    ESP_LOGD(TAG, "hw fifo overflow\n");
+                    ESP_LOGD(TAG, "OUTPUT hw fifo overflow\n");
                     xQueueReset(xMbFirewallUartQueueOutput);
                     break;
                 //Event of UART ring buffer full
                 case UART_BUFFER_FULL:
-                    ESP_LOGD(TAG, "ring buffer full\n");
+                    ESP_LOGD(TAG, "OUTPUT ring buffer full\n");
                     xQueueReset(xMbFirewallUartQueueOutput);
                     uart_flush_input(ucUartNumberOutput);
                     break;
                 //Event of UART RX break detected
                 case UART_BREAK:
-                    ESP_LOGD(TAG, "uart rx break\n");
+                    ESP_LOGD(TAG, "OUTPUT uart rx break\n");
                     break;
                 //Event of UART parity check error
                 case UART_PARITY_ERR:
-                    ESP_LOGD(TAG, "uart parity error\n");
+                    ESP_LOGD(TAG, "OUTPUT uart parity error\n");
                     break;
                 //Event of UART frame error
                 case UART_FRAME_ERR:
-                    ESP_LOGD(TAG, "uart frame error\n");
+                    ESP_LOGD(TAG, "OUTPUT uart frame error\n");
                     break;
                 default:
-                    ESP_LOGD(TAG, "uart event type: %d\n", xEvent.type);
+                    ESP_LOGD(TAG, "OUTPUT uart event type: %d\n", xEvent.type);
                     break;
             }
         }
@@ -496,7 +492,6 @@ void vMBFirewallPortSerialClose()
 {
     (void)vTaskSuspend(xMbFirewallTaskHandleInput);
     (void)vTaskDelete(xMbFirewallTaskHandleInput);
-
 
     (void)vTaskSuspend(xMbFirewallTaskHandleOutput);
     (void)vTaskDelete(xMbFirewallTaskHandleOutput);

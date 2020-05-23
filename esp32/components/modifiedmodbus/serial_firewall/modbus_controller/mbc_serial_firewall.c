@@ -34,8 +34,11 @@ static void modbus_firewall_task(void *pvParameters)
         // Check if stack started then poll for data
         if (status & MB_EVENT_STACK_STARTED) {
             printf("Iteration for the main task\n");
+            (void)eMBFirewallPoll();
+            (void)xMBFirewallOutputPortSerialTxPoll();
+            (void)xMBFirewallInputPortSerialTxPoll();
             /* Simulate some waiting here - get the main task some CPU time*/ 
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            // vTaskDelay(1000 / portTICK_PERIOD_MS);
             // (void)eMBPoll(); // allow stack to process data
             // (void)xMBPortSerialTxPoll(); // Send response buffer if ready
         }

@@ -70,6 +70,7 @@ typedef enum {
 } eMBErrorCode;
 #endif
 
+
 eMBErrorCode eMBFirewallInit(eMBMode eMode, UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityInput,
                              UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput);
 
@@ -80,6 +81,8 @@ eMBErrorCode eMBFirewallClose(void);
 eMBErrorCode eMBFirewallEnable(void);
 
 eMBErrorCode eMBFirewallDisable(void);
+
+eMBErrorCode eMBFirewallPoll(void);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C
