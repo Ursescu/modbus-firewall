@@ -36,20 +36,6 @@
     } while (0)
 
 /**
- * @brief Device communication parameters for firewall
- */
-typedef struct {
-    mb_mode_type_t mode_input;   /*!< Modbus communication mode */
-    mb_mode_type_t mode_output;  /*!< Modbus communication mode */
-    uart_port_t port_input;      /*!< Modbus communication port (UART) INPUT number */
-    uart_port_t port_output;     /*!< Modbus communication port (UART) OUTPUT number */
-    uint32_t baudrate_input;     /*!< Modbus baudrate INTPUT */
-    uint32_t baudrate_output;    /*!< Modbus baudrate OUTPUT */
-    uart_parity_t parity_input;  /*!< Modbus UART parity settings INPUT */
-    uart_parity_t parity_output; /*!< Modbus UART parity settings OUTPUT */
-} mb_firewall_comm_info_t;
-
-/**
  * @brief Modbus controller handler structure
  */
 typedef struct {
@@ -59,12 +45,8 @@ typedef struct {
     TaskHandle_t mbf_task_handle;                /*!< task handle */
     EventGroupHandle_t mbf_event_group;          /*!< controller event group */
     QueueHandle_t mbf_notification_queue_handle; /*!< controller notification queue */
-    // mb_register_area_descriptor_t mbs_area_descriptors[MB_PARAM_COUNT]; /*!< register area descriptors */
+    mb_firewall_rule_function_t mbf_packet_handler;
 } mb_firewall_options_t;
-
-// typedef mb_event_group_t (*iface_check_event)(mb_event_group_t);          /*!< Interface method check_event */
-// typedef esp_err_t (*iface_get_param_info)(mb_param_info_t*, uint32_t);    /*!< Interface method get_param_info */
-// typedef esp_err_t (*iface_set_descriptor)(mb_register_area_descriptor_t); /*!< Interface method set_descriptor */
 
 /**
  * @brief Request mode for parameter to use in data dictionary
@@ -79,15 +61,6 @@ typedef struct
     iface_setup setup;     /*!< Interface method setup */
     iface_start start;     /*!< Interface method start */
 
-    // iface_check_event check_event;          /*!< Interface method check_event */
-    // iface_get_param_info get_param_info;    /*!< Interface method get_param_info */
-    // iface_set_descriptor set_descriptor;    /*!< Interface method set_descriptor */
-
-    // // Modbus register calback function pointers
-    // reg_discrete_cb slave_reg_cb_discrete;  /*!< Stack callback discrete rw method */
-    // reg_input_cb slave_reg_cb_input;        /*!< Stack callback input rw method */
-    // reg_holding_cb slave_reg_cb_holding;    /*!< Stack callback holding rw method */
-    // reg_coils_cb slave_reg_cb_coils;        /*!< Stack callback coils rw method */
 } mb_firewall_interface_t;
 
 #endif

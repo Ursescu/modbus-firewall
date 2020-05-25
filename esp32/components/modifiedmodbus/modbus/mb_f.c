@@ -97,47 +97,14 @@ BOOL( *pxMBFirewallOutputPortCBTimerExpired ) ( void );
 
 static const char *TAG = "MB_FIREWALL_FSM";
 
-
-/* An array of Modbus functions handlers which associates Modbus function
- * codes with implementing functions.
- */
-static xMBFunctionHandler xFuncHandlers[MB_FUNC_HANDLERS_MAX] = {
-#if MB_FUNC_OTHER_REP_SLAVEID_ENABLED > 0
-    {MB_FUNC_OTHER_REPORT_SLAVEID, eMBFuncReportSlaveID},
+#if MB_FIREWALL_RTU_ENABLED > 0
+static xMBFirewallSerialPacketHandler xMBFirewallPacketHandlerCur;
 #endif
-#if MB_FUNC_READ_INPUT_ENABLED > 0
-    {MB_FUNC_READ_INPUT_REGISTER, eMBFuncReadInputRegister},
-#endif
-#if MB_FUNC_READ_HOLDING_ENABLED > 0
-    {MB_FUNC_READ_HOLDING_REGISTER, eMBFuncReadHoldingRegister},
-#endif
-#if MB_FUNC_WRITE_MULTIPLE_HOLDING_ENABLED > 0
-    {MB_FUNC_WRITE_MULTIPLE_REGISTERS, eMBFuncWriteMultipleHoldingRegister},
-#endif
-#if MB_FUNC_WRITE_HOLDING_ENABLED > 0
-    {MB_FUNC_WRITE_REGISTER, eMBFuncWriteHoldingRegister},
-#endif
-#if MB_FUNC_READWRITE_HOLDING_ENABLED > 0
-    {MB_FUNC_READWRITE_MULTIPLE_REGISTERS, eMBFuncReadWriteMultipleHoldingRegister},
-#endif
-#if MB_FUNC_READ_COILS_ENABLED > 0
-    {MB_FUNC_READ_COILS, eMBFuncReadCoils},
-#endif
-#if MB_FUNC_WRITE_COIL_ENABLED > 0
-    {MB_FUNC_WRITE_SINGLE_COIL, eMBFuncWriteCoil},
-#endif
-#if MB_FUNC_WRITE_MULTIPLE_COILS_ENABLED > 0
-    {MB_FUNC_WRITE_MULTIPLE_COILS, eMBFuncWriteMultipleCoils},
-#endif
-#if MB_FUNC_READ_DISCRETE_INPUTS_ENABLED > 0
-    {MB_FUNC_READ_DISCRETE_INPUTS, eMBFuncReadDiscreteInputs},
-#endif
-};
 
 /* ----------------------- Start implementation -----------------------------*/
 eMBErrorCode
 eMBFirewallInit( eMBMode eMode, UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityInput,
-                 UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput )
+                 UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput, xMBFirewallPacketHandler xPacketHandler)
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
@@ -165,6 +132,8 @@ eMBFirewallInit( eMBMode eMode, UCHAR ucPortInput, ULONG ulBaudRateInput, eMBPar
     
         pxMBFirewallInputPortCBTimerExpired = xMBFirewallInputRTUTimerT35Expired;
         pxMBFirewallOutputPortCBTimerExpired = xMBFirewallOutputRTUTimerT35Expired;
+
+        xMBFirewallPacketHandlerCur = xPacketHandler;
 
         eStatus = eMBFirewallRTUInit(ucPortInput, ulBaudRateInput, eParityInput, ucPortOutput, ulBaudRateOutput, eParityOutput);
         break;
@@ -352,6 +321,7 @@ eMBFirewallPoll( void )
     int             i;
     eMBErrorCode    eStatus = MB_ENOERR;
     eMBFirewallEventType    eEvent;
+    BOOL    xPacketPass;
 
     /* Check if the protocol stack is ready. */
     if( eMBState != STATE_ENABLED )
@@ -379,17 +349,17 @@ eMBFirewallPoll( void )
             break;
 
         case EV_F_INPUT_EXECUTE:
-            ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
-            ESP_LOGD(TAG, "Deep packet inspection\n");
-            ESP_LOGD(TAG, "Address: %hhu\n", ucRcvAddress);
-            ESP_LOGD(TAG, "Function code: %hhu\n", ucFunctionCode);
-
-            ESP_LOGD(TAG, "Now relay it to output\n");
-
             /* Call callback with the frame */
+            xPacketPass = xMBFirewallPacketHandlerCur(ucRcvAddress, ucMBFrame, usLength);
 
-            /* Need to be able to modify and filter this packet */
-            eStatus = peMBFirewallOutputFrameSendCur( ucRcvAddress, ucMBFrame, usLength );
+            if (xPacketPass == TRUE) {
+                eStatus = peMBFirewallOutputFrameSendCur( ucRcvAddress, ucMBFrame, usLength );
+            }
+            else {
+                /* Packet blocked, it will wait for timeout */
+                eStatus = MB_EINVAL;
+            }
+
             break;
 
         case EV_F_OUTPUT_FRAME_RECEIVED:

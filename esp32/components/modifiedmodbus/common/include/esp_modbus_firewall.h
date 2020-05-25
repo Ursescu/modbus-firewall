@@ -24,15 +24,20 @@ typedef struct {
     size_t size;                            /*!< Modbus event register size (number of registers)*/
 } mb_firewall_info_t;
 
-// /**
-//  * @brief Parameter storage area descriptor
-//  */
-// typedef struct {
-//     uint16_t start_offset;                  /*!< Modbus start address for area descriptor */
-//     mb_param_type_t type;                   /*!< Type of storage area descriptor */
-//     void* address;                          /*!< Instance address for storage area descriptor */
-//     size_t size;                            /*!< Instance size for area descriptor (bytes) */
-// } mb_register_area_descriptor_t;
+typedef char (*mb_firewall_rule_function_t)(unsigned char, unsigned char *, unsigned short );
+
+typedef struct {
+    mb_mode_type_t mode_input;   /*!< Modbus communication mode */
+    mb_mode_type_t mode_output;  /*!< Modbus communication mode */
+    uart_port_t port_input;      /*!< Modbus communication port (UART) INPUT number */
+    uart_port_t port_output;     /*!< Modbus communication port (UART) OUTPUT number */
+    uint32_t baudrate_input;     /*!< Modbus baudrate INTPUT */
+    uint32_t baudrate_output;    /*!< Modbus baudrate OUTPUT */
+    uart_parity_t parity_input;  /*!< Modbus UART parity settings INPUT */
+    uart_parity_t parity_output; /*!< Modbus UART parity settings OUTPUT */
+    mb_firewall_rule_function_t packet_handler;
+} mb_firewall_comm_info_t;
+
 
 /**
  * @brief Initialize Modbus controller and stack
@@ -73,40 +78,6 @@ esp_err_t mbc_firewall_start(void);
  *     - ESP_OK Success
  *     - ESP_ERR_INVALID_ARG Incorrect parameter data
  */
-esp_err_t mbc_firewall_setup(void* comm_info);
-
-/**
- * @brief Wait for specific event on parameter change.
- *
- * @param group Group event bit mask to wait for change
- *
- * @return
- *     - mb_event_group_t event bits triggered
- */
-// mb_event_group_t mbc_slave_check_event(mb_event_group_t group);
-
-// /**
-//  * @brief Get parameter information
-//  *
-//  * @param[out] reg_info parameter info structure
-//  * @param timeout Timeout in milliseconds to read information from
-//  *                parameter queue
-//  * @return
-//  *     - ESP_OK Success
-//  *     - ESP_ERR_TIMEOUT Can not get data from parameter queue
-//  *                       or queue overflow
-//  */
-// esp_err_t mbc_slave_get_param_info(mb_param_info_t* reg_info, uint32_t timeout);
-
-// /**
-//  * @brief Set Modbus area descriptor
-//  *
-//  * @param descr_data Modbus registers area descriptor structure
-//  *
-//  * @return
-//  *     - ESP_OK: The appropriate descriptor is set
-//  *     - ESP_ERR_INVALID_ARG: The argument is incorrect
-//  */
-// esp_err_t mbc_slave_set_descriptor(mb_register_area_descriptor_t descr_data);
+esp_err_t mbc_firewall_setup(void* firewall_info);
 
 #endif

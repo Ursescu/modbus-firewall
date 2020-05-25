@@ -12,6 +12,13 @@
 /* Shared pointer to interface structure */
 static mb_firewall_interface_t* mbf_interface_ptr = NULL;
 
+// Default modbus fireall packet handler, pass everything
+static char modbus_firewall_packet_handler(unsigned char addr, unsigned char *frame, unsigned short len) {
+
+    /* Pass all packets */
+    return TRUE;
+}
+
 // Modbus task function
 static void modbus_firewall_task(void *pvParameters)
 {
@@ -80,6 +87,9 @@ static esp_err_t mbc_serial_firewall_setup(void* comm_info)
     MB_FIREWALL_CHECK((comm_settings->parity_output <= UART_PARITY_EVEN), ESP_ERR_INVALID_ARG,
             "mb wrong parity option = (0x%x).", (uint32_t)comm_settings->parity_output);
 
+    MB_FIREWALL_CHECK((comm_settings->packet_handler != NULL), ESP_ERR_INVALID_ARG,
+                    "mb wrong packet handler function.");
+
     // Set communication options of the controller
     mbf_opts->mbf_comm_input.mode = comm_settings->mode_input;
     mbf_opts->mbf_comm_input.port = comm_settings->port_input;
@@ -90,6 +100,8 @@ static esp_err_t mbc_serial_firewall_setup(void* comm_info)
     mbf_opts->mbf_comm_output.port = comm_settings->port_output;
     mbf_opts->mbf_comm_output.baudrate = comm_settings->baudrate_output;
     mbf_opts->mbf_comm_output.parity = comm_settings->parity_output;
+
+    mbf_opts->mbf_packet_handler = comm_settings->packet_handler;
 
     return ESP_OK;
 }
@@ -109,7 +121,8 @@ static esp_err_t mbc_serial_firewall_start(void)
                          (eMBParity)mbf_opts->mbf_comm_input.parity,
                          (UCHAR)mbf_opts->mbf_comm_output.port,
                          (ULONG)mbf_opts->mbf_comm_output.baudrate,
-                         (eMBParity)mbf_opts->mbf_comm_output.parity);
+                         (eMBParity)mbf_opts->mbf_comm_output.parity,
+                         (xMBFirewallSerialPacketHandler)mbf_opts->mbf_packet_handler);
 
     MB_FIREWALL_CHECK((status == MB_ENOERR), ESP_ERR_INVALID_STATE,
             "mb stack initialization failure, eMBFirewallInit() returns (0x%x).", status);
@@ -188,6 +201,8 @@ esp_err_t mbc_serial_firewall_create(mb_port_type_t port_type, void** handler) {
     mbf_opts->mbf_comm_output.port = MB_UART_PORT_OUT;
     mbf_opts->mbf_comm_output.baudrate = MB_DEVICE_SPEED;
     mbf_opts->mbf_comm_output.parity = MB_PARITY_NONE;
+
+    mbf_opts->mbf_packet_handler = &modbus_firewall_packet_handler;
 
     // Initialization of active context of the Modbus controller
     BaseType_t status = 0;

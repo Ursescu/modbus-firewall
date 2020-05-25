@@ -70,9 +70,15 @@ typedef enum {
 } eMBErrorCode;
 #endif
 
+typedef BOOL (*xMBFirewallPacketHandler)(UCHAR pucRcvAddress,
+                                         UCHAR* pucFrame,
+                                         USHORT pusLength);
+
+typedef xMBFirewallPacketHandler xMBFirewallSerialPacketHandler;
+typedef xMBFirewallPacketHandler xMBFirewallTCPPacketHandler;
 
 eMBErrorCode eMBFirewallInit(eMBMode eMode, UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityInput,
-                             UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput);
+                             UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput, xMBFirewallPacketHandler packet_handler);
 
 eMBErrorCode eMBFirewallTCPInit(USHORT usTCPPort);
 
