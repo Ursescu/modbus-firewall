@@ -28,9 +28,6 @@ static void modbus_firewall_task(void *pvParameters)
     
     MB_FIREWALL_ASSERT(mbf_opts != NULL);
 
-
-    printf("Internal task for firewall started\n");
-
     // Main Modbus Firewall stack processing cycle
     for (;;) {
         BaseType_t status = xEventGroupWaitBits(mbf_opts->mbf_event_group,
@@ -38,20 +35,19 @@ static void modbus_firewall_task(void *pvParameters)
                                                 pdFALSE, // do not clear bits
                                                 pdFALSE,
                                                 portMAX_DELAY);
+
         // Check if stack started then poll for data
         if (status & MB_EVENT_STACK_STARTED) {
-            printf("Iteration for the main task\n");
+            /* Polling for input data, main loop for the firewall stack */
             (void)eMBFirewallPoll();
+
+            /* If there is data for the output, send it here */
             (void)xMBFirewallOutputPortSerialTxPoll();
+
+            /* If there is data for the input, send it here*/
             (void)xMBFirewallInputPortSerialTxPoll();
         }
     }
-}
-// The helper function to get time stamp in microseconds
-static uint64_t get_time_stamp()
-{
-    uint64_t time_stamp = esp_timer_get_time();
-    return time_stamp;
 }
 
 // Setup Modbus controller parameters
