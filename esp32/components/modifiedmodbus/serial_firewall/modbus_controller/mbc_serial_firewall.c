@@ -44,10 +44,6 @@ static void modbus_firewall_task(void *pvParameters)
             (void)eMBFirewallPoll();
             (void)xMBFirewallOutputPortSerialTxPoll();
             (void)xMBFirewallInputPortSerialTxPoll();
-            /* Simulate some waiting here - get the main task some CPU time*/ 
-            // vTaskDelay(1000 / portTICK_PERIOD_MS);
-            // (void)eMBPoll(); // allow stack to process data
-            // (void)xMBPortSerialTxPoll(); // Send response buffer if ready
         }
     }
 }
@@ -232,19 +228,11 @@ esp_err_t mbc_serial_firewall_create(mb_port_type_t port_type, void** handler) {
     MB_FIREWALL_ASSERT(mbf_opts->mbf_task_handle != NULL); // The task is created but handle is incorrect
 
     // Initialize interface function pointers
-    // mbs_interface_ptr->check_event = mbc_serial_slave_check_event;
     mbf_interface_ptr->destroy = mbc_serial_firewall_destroy;
-    // mbs_interface_ptr->get_param_info = mbc_serial_slave_get_param_info;
     mbf_interface_ptr->init = mbc_serial_firewall_create;
-    // mbs_interface_ptr->set_descriptor = mbc_serial_slave_set_descriptor;
+
     mbf_interface_ptr->setup = mbc_serial_firewall_setup;
     mbf_interface_ptr->start = mbc_serial_firewall_start;
-
-    // Initialize stack callback function pointers
-    // mbs_interface_ptr->slave_reg_cb_discrete = eMBRegDiscreteCBSerialSlave;
-    // mbs_interface_ptr->slave_reg_cb_input = eMBRegInputCBSerialSlave;
-    // mbs_interface_ptr->slave_reg_cb_holding = eMBRegHoldingCBSerialSlave;
-    // mbs_interface_ptr->slave_reg_cb_coils = eMBRegCoilsCBSerialSlave;
 
     *handler = (void*)mbf_interface_ptr;
 

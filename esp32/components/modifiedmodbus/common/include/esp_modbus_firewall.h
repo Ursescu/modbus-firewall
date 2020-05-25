@@ -48,7 +48,6 @@ typedef struct {
  *     - ESP_OK   Success
  *     - ESP_ERR_NO_MEM Parameter error
  */
-//esp_err_t mbc_slave_init(mb_port_type_t port_type, void** handler);
 esp_err_t mbc_firewall_init(mb_port_type_t port_type, void** handler);
 
 /**
