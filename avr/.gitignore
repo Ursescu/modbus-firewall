@@ -1,1 +1,10 @@
 .vscode/
+*.o
+*.lst
+.dep/
+*.eep
+*.elf
+*.hex
+*.lss
+*.map
+*.sym
