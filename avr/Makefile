@@ -293,10 +293,12 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = stk500v2
+AVRDUDE_PROGRAMMER = arduino
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = avrdoper    # programmer connected to serial device
+AVRDUDE_PORT = /dev/ttyUSB1    # programmer connected to serial device
+
+AVRDUDE_BAUD = 115200
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
@@ -314,12 +316,13 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 # Increase verbosity level.  Please use this when submitting bug
 # reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude> 
 # to submit bug reports.
-#AVRDUDE_VERBOSE = -v -v
+AVRDUDE_VERBOSE = -v -v
 
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
+AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -b $(AVRDUDE_BAUD)
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
+
 
 
 
