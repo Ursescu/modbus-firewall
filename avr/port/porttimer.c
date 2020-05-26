@@ -22,7 +22,6 @@
 /* ----------------------- AVR includes -------------------------------------*/
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/signal.h>
 
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
@@ -38,7 +37,7 @@
 
 /* ----------------------- Static variables ---------------------------------*/
 static USHORT   usTimerOCRADelta;
-static USHORT   usTimerOCRBDelta;
+// static USHORT   usTimerOCRBDelta;
 
 /* ----------------------- Start implementation -----------------------------*/
 BOOL
