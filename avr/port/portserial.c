@@ -132,12 +132,12 @@ xMBPortSerialGetByte( CHAR * pucByte )
     return TRUE;
 }
 
-ISR( USART_UDRE_vect )
+ISR( USART0_UDRE_vect )
 {
     pxMBFrameCBTransmitterEmpty(  );
 }
 
-ISR( USART_RX_vect )
+ISR( USART0_RX_vect )
 {
     pxMBFrameCBByteReceived(  );
 }
