@@ -30,10 +30,13 @@
 #ifndef _MB_RTU_H
 #define _MB_RTU_H
 
+#include "mbconfig.h"
+
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
-    eMBErrorCode eMBRTUInit( UCHAR slaveAddress, UCHAR ucPort, ULONG ulBaudRate,
+
+eMBErrorCode eMBRTUInit( UCHAR slaveAddress, UCHAR ucPort, ULONG ulBaudRate,
                              eMBParity eParity );
 void            eMBRTUStart( void );
 void            eMBRTUStop( void );
@@ -43,6 +46,25 @@ BOOL            xMBRTUReceiveFSM( void );
 BOOL            xMBRTUTransmitFSM( void );
 BOOL            xMBRTUTimerT15Expired( void );
 BOOL            xMBRTUTimerT35Expired( void );
+
+#if MB_FIREWALL_RTU_ENABLED > 0
+eMBErrorCode    eMBFirewallRTUInit( UCHAR ucPortInput, ULONG ulBaudRateInput, eMBParity eParityInput,
+                                    UCHAR ucPortOutput, ULONG ulBaudRateOutput, eMBParity eParityOutput);
+void            eMBFirewallRTUStart( void );
+void            eMBFirewallRTUStop( void );
+eMBErrorCode    eMBFirewallInputRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength );
+eMBErrorCode    eMBFirewallOutputRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength );
+eMBErrorCode    eMBFirewallInputRTUSend( UCHAR slaveAddress, const UCHAR * pucFrame, USHORT usLength );
+eMBErrorCode    eMBFirewallOutputRTUSend( UCHAR slaveAddress, const UCHAR * pucFrame, USHORT usLength );
+BOOL            xMBFirewallInputRTUReceiveFSM( void );
+BOOL            xMBFirewallOutputRTUReceiveFSM( void );
+BOOL            xMBFirewallInputRTUTransmitFSM( void );
+BOOL            xMBFirewallOutputRTUTransmitFSM( void );
+BOOL            xMBFirewallInputRTUTimerT35Expired( void );
+BOOL            xMBFirewallOutputRTUTimerT35Expired( void );
+
+#endif
+
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

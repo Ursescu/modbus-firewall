@@ -30,6 +30,8 @@
 #ifndef _MB_PORT_H
 #define _MB_PORT_H
 
+#include "mbconfig.h"
+
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
@@ -44,6 +46,21 @@ typedef enum
     EV_FRAME_SENT               /*!< Frame sent. */
 } eMBEventType;
 
+
+#if MB_FIREWALL_RTU_ENABLED  || MB_FIREWALL_ASCII_ENABLED
+typedef enum
+{
+    EV_F_READY = 0x01,                       /*!< Startup finished. */
+    EV_F_INPUT_FRAME_RECEIVED = 0x02,              /*!< Frame received. */
+    EV_F_INPUT_EXECUTE = 0x04,                 /*!< Execute function. */
+    EV_F_INPUT_FRAME_SENT = 0x08,               /*!< Frame sent. */
+    EV_F_OUTPUT_FRAME_RECEIVED = 0x10,          /*!< Frame received. */
+    EV_F_OUTPUT_EXECUTE = 0x12,                 /*!< Execute function. */
+    EV_F_OUTPUT_FRAME_SENT = 0x14               /*!< Frame sent. */
+
+} eMBFirewallEventType;
+
+#endif 
 /*! \ingroup modbus
  * \brief Parity used for characters in serial mode.
  *
@@ -65,6 +82,14 @@ BOOL            xMBPortEventPost( eMBEventType eEvent );
 
 BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
 
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+BOOL            xMBFirewallPortEventInit( void );
+
+BOOL            xMBFirewallPortEventPost( eMBFirewallEventType eEvent );
+
+BOOL            xMBFirewallPortEventGet( eMBFirewallEventType * eEvent );
+#endif
+
 /* ----------------------- Serial port functions ----------------------------*/
 
 BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
@@ -80,6 +105,32 @@ BOOL            xMBPortSerialGetByte( CHAR * pucByte );
 
 BOOL            xMBPortSerialPutByte( CHAR ucByte );
 
+
+#if MB_FIREWALL_RTU_ENABLED  || MB_FIREWALL_ASCII_ENABLED
+
+BOOL            xMBFirewallPortSerialInit( UCHAR ucPortInput, ULONG ulBaudRateInput,
+                                   UCHAR ucDataBitsInput, eMBParity eParityInput,
+                                   UCHAR ucPortOutput, ULONG ulBaudRateOutput,
+                                   UCHAR ucDataBitsOutput, eMBParity eParityOutput);
+
+void            vMBFirewallPortClose( void );
+
+void            xMBFirewallPortSerialClose( void );
+
+void            vMBFirewallInputPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable);
+
+void            vMBFirewallOutputPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable);
+
+BOOL            xMBFirewallInputPortSerialGetByte( CHAR * pucByte );
+
+BOOL            xMBFirewallOutputPortSerialGetByte( CHAR * pucByte );
+
+BOOL            xMBFirewallInputPortSerialPutByte( CHAR ucByte );
+
+BOOL            xMBFirewallOutputPortSerialPutByte( CHAR ucByte );
+
+#endif
+
 /* ----------------------- Timers functions ---------------------------------*/
 BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
 
@@ -90,6 +141,23 @@ void            vMBPortTimersEnable( void );
 void            vMBPortTimersDisable( void );
 
 void            vMBPortTimersDelay( USHORT usTimeOutMS );
+
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+BOOL            xMBFirewallPortTimersInit( USHORT usTimeOut50usInput,  USHORT usTimeOut50usOutput );
+
+void            xMBFirewallInputPortTimersClose( void );
+
+void            xMBFirewallOutputPortTimersClose( void );
+
+void            vMBFirewallInputPortTimersEnable( void );
+
+void            vMBFirewallOutputPortTimersEnable( void );
+
+void            vMBFirewallInputPortTimersDisable( void );
+
+void            vMBFirewallOutputPortTimersDisable( void );
+
+#endif 
 
 /* ----------------------- Callback for the protocol stack ------------------*/
 
@@ -110,6 +178,17 @@ extern          BOOL( *pxMBFrameCBByteReceived ) ( void );
 extern          BOOL( *pxMBFrameCBTransmitterEmpty ) ( void );
 
 extern          BOOL( *pxMBPortCBTimerExpired ) ( void );
+
+#if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
+extern          BOOL( *pxMBFirewallInputFrameCBByteReceived ) ( void );
+extern          BOOL( *pxMBFirewallOutputFrameCBByteReceived ) ( void );
+
+extern          BOOL( *pxMBFirewallInputFrameCBTransmitterEmpty ) ( void );
+extern          BOOL( *pxMBFirewallOutputFrameCBTransmitterEmpty ) ( void );
+
+extern          BOOL( *pxMBFirewallInputPortCBTimerExpired ) ( void );
+extern          BOOL( *pxMBFirewallOutputPortCBTimerExpired ) ( void );
+#endif
 
 /* ----------------------- TCP port functions -------------------------------*/
 BOOL            xMBTCPPortInit( USHORT usTCPPort );

@@ -83,9 +83,8 @@ OBJDIR = .
 
 # List C source files here. (C dependencies are automatically generated.)
 #SRC = $(TARGET).c
-SRC = 		modbus/mb.c \
-			modbus/rtu/mbrtu.c \
-			modbus/ascii/mbascii.c \
+SRC = 		modbus/mb_f.c \
+			modbus/rtu/mbrtu_f.c \
 			modbus/functions/mbfunccoils.c \
 			modbus/functions/mbfuncdiag.c \
 			modbus/functions/mbfuncholding.c \
@@ -94,9 +93,9 @@ SRC = 		modbus/mb.c \
 			modbus/functions/mbfuncdisc.c \
 			modbus/functions/mbutils.c \
 			main.c \
-			port/portserial.c \
-			port/portevent.c \
-			port/porttimer.c \
+			port/portserial_f.c \
+			port/portevent_f.c \
+			port/porttimer_f.c \
 			port/mbcrc.c \
 			
 
