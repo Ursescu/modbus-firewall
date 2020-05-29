@@ -6,7 +6,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_log.h"
 
-static const char *TAG = "MODBUS_FIREWALL";
+static const char *TAG = "MB_FIREWALL";
 
 // |  1B  |   2B  |    2B   |  REST  |
 // | ADDR | FCODE |  SADDR  |  DATA  |
