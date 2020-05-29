@@ -57,6 +57,11 @@ typedef struct mb_firewall_rule {
 } mb_firewall_rule_t;
 
 
+typedef enum firewall_match {
+    FIREWALL_RULE_NOT_FOUND = 0,
+    FIREWALL_RULE_FOUND = 1,
+} firewall_match_t;
+
 
 /* Coils defines */
 
