@@ -5,11 +5,9 @@
 #include "esp_err.h"
 #include "sdkconfig.h"
 
-typedef enum mb_firewall_rule_result {
-    FIREWALL_FAIL,
-    FIREWALL_PASS
-} mb_firewall_rule_result_t;
-
+/* The firewall callback function that will be called in order to determine
+ *  if packet shall pass or not.
+ */
 char firewall_cb(uint8_t, uint8_t *, uint16_t);
 
 #endif
