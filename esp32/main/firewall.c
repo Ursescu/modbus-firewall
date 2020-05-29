@@ -36,20 +36,10 @@ static const char *TAG = "MODBUS_FIREWALL";
 // |  1B  |   2B  |    2B   |  REST  |
 // | ADDR | FCODE |  SADDR  |  DATA  |
 
-typedef enum mb_firewall_stat {
-    FIREWALL_FAIL = 0,
-    FIREWALL_PASS
-} mb_firewall_stat_t;
+/* External firewall type */
+extern mb_firewall_mode_t firewall_type;
+extern mb_firewall_adress firewall_addresses[MB_FIREWALL_MAX_ADDRS];
 
-typedef mb_firewall_stat_t (*mb_firewall_func_handler)(uint8_t *, uint16_t);
-
-typedef struct mb_firewall_func {
-    uint8_t mb_function_code;
-    mb_firewall_func_handler handler;
-} mb_firewall_func_t;
-
-typedef struct mb_firewall_rule {
-} mb_firewall_rule_t;
 
 /* 
  *  
@@ -58,9 +48,7 @@ typedef struct mb_firewall_rule {
  *  
  */
 
-/* External firewall type */
-extern mb_firewall_mode_t firewall_type;
-extern mb_firewall_adress firewall_addresses[MB_FIREWALL_MAX_ADDRS];
+
 
 /* Pass everything */
 static mb_firewall_stat_t mb_firewall_pass(uint8_t *frame, uint16_t len) {

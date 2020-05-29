@@ -14,6 +14,21 @@ typedef enum mb_firewall_mode {
 
 typedef uint8_t mb_firewall_adress;
 
+typedef enum mb_firewall_stat {
+    FIREWALL_FAIL = 0,
+    FIREWALL_PASS
+} mb_firewall_stat_t;
+
+typedef mb_firewall_stat_t (*mb_firewall_func_handler)(uint8_t *, uint16_t);
+
+typedef struct mb_firewall_func {
+    uint8_t mb_function_code;
+    mb_firewall_func_handler handler;
+} mb_firewall_func_t;
+
+typedef struct mb_firewall_rule {
+} mb_firewall_rule_t;
+
 /* The firewall callback function that will be called in order to determine
  *  if packet shall pass or not.
  */
