@@ -307,10 +307,8 @@ eMBFirewallOutputRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT u
      * slow with processing the received frame and the master sent another
      * frame on the network. We have to abort sending the frame.
      */
-    printf("Sending to slave \n");
     if( eRcvStateOutput == STATE_O_RX_IDLE )
     {
-        printf("Setting up the variables\n");
         /* First byte before the Modbus-PDU is the slave address. */
         pucSndBufferCurOutput = ( UCHAR * ) pucFrame - 1;
         usSndBufferCountOutput = 1;
