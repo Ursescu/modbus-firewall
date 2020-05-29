@@ -34,7 +34,6 @@ main( void )
 
     /* Enable the Modbus Protocol Stack. */
     eStatus = eMBFirewallEnable(  );
-    DDRD |= _BV(DD7);
     for( ;; )
     {
         // _delay_ms(1000);

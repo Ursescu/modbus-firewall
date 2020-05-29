@@ -305,8 +305,6 @@ eMBFirewallPoll( void )
             xPacketPass = xMBFirewallPacketHandlerCur(ucRcvAddress, ucMBFrame, usLength);
 
             if (xPacketPass == TRUE) {
-
-                PORTD ^= _BV(DD7);
                 eStatus = peMBFirewallOutputFrameSendCur( ucRcvAddress, ucMBFrame, usLength );
             }
             else {
@@ -334,7 +332,6 @@ eMBFirewallPoll( void )
             break;
 
         case EV_F_OUTPUT_FRAME_SENT:
-            PORTD ^= _BV(DD7);
             break;
         }
     }
