@@ -101,7 +101,9 @@ static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
     }
 }
 
-/* Firewall callback function implementation, based on liniar lookup tables */
+/* Firewall callback function implementation, based on liniar lookup tables
+ * Implementation based on Waterfall design. Step by step checking.
+ */
 char firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
 
     uint8_t function_code = frame[MB_PDU_FUNC_OFF];
