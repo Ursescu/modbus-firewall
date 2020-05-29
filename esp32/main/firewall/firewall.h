@@ -31,6 +31,12 @@
 
 #define MB_FIREWALL_NO_HANDLER -1
 
+typedef enum mb_firewall_reg_mode
+{
+    FIREWALL_REG_READ,
+    FIREWALL_REG_WRITE
+} mb_firewall_reg_mode_t;
+
 /* Defines and typedefs for the firewall rule system */
 #define MB_FIREWALL_MAX_ADDRS 32
 
