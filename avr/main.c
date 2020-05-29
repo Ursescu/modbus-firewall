@@ -11,6 +11,13 @@
 #define REG_INPUT_START 1000
 #define REG_INPUT_NREGS 4
 
+#define MB_DEV_SPEED 115200
+
+#define MB_UART_INPUT_NUM 0
+#define MB_UART_OUTPUT_NUM 1
+
+
+
 /* ----------------------- Static variables ---------------------------------*/
 static USHORT   usRegInputStart = REG_INPUT_START;
 static USHORT   usRegInputBuf[REG_INPUT_NREGS];
@@ -28,7 +35,7 @@ main( void )
 {
     eMBErrorCode    eStatus;
 
-    eStatus = eMBFirewallInit( MB_RTU, 0, 115200, MB_PAR_NONE, 1, 115200, MB_PAR_NONE, firewall_rule);
+    eStatus = eMBFirewallInit( MB_RTU, MB_UART_INPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, MB_UART_OUTPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, firewall_rule);
 
     sei(  );
 
