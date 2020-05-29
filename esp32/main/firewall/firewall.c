@@ -35,7 +35,7 @@ static inline mb_firewall_stat_t mb_firewall_fail(uint8_t *frame, uint16_t len) 
 
 mb_firewall_func_t mb_firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_OTHER_REPORT_SLAVEID, mb_firewall_pass},
-    {MB_FUNC_READ_INPUT_REGISTER, mb_firewall_pass},
+    {MB_FUNC_READ_INPUT_REGISTER, mb_firewall_read_input_registers},
     {MB_FUNC_READ_HOLDING_REGISTER, mb_firewall_pass},
     {MB_FUNC_WRITE_MULTIPLE_REGISTERS, mb_firewall_pass},
     {MB_FUNC_WRITE_REGISTER, mb_firewall_pass},

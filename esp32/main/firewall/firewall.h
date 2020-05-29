@@ -80,4 +80,6 @@ mb_firewall_stat_t mb_firewall_write_multiple_coils(uint8_t *frame, uint16_t len
 /* Discrete inputs defines */
 mb_firewall_stat_t mb_firewall_read_discrete_inputs(uint8_t *frame, uint16_t len);
 
+/* Input registers defines */
+mb_firewall_stat_t mb_firewall_read_input_registers(uint8_t *frame, uint16_t len);
 #endif
