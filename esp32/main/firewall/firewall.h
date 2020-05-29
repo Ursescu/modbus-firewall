@@ -82,4 +82,15 @@ mb_firewall_stat_t mb_firewall_read_discrete_inputs(uint8_t *frame, uint16_t len
 
 /* Input registers defines */
 mb_firewall_stat_t mb_firewall_read_input_registers(uint8_t *frame, uint16_t len);
+
+/* Holding registers defines */
+mb_firewall_stat_t mb_firewall_read_registers(uint8_t *frame, uint16_t len);
+
+mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t len);
+
+mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t len);
+
+mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uint16_t len);
+
+
 #endif
