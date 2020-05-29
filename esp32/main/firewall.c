@@ -1,73 +1,79 @@
-/*
- * Ursescu Ionut
- * Modbus firewall entry point.
- */
 
-#include <stdio.h>
-#include "esp_err.h"
-#include "sdkconfig.h"
-#include "esp_log.h"
-#include "mbcontroller.h"
+#include "firewall.h"
+#include "mbproto.h"
 
-#define MB_PORT_NUM_IN (UART_NUM_MAX - 1)   // Number of UART port used for Modbus IN connection
-#define MB_PORT_NUM_OUT (UART_NUM_MAX - 2)  // Number of UART port used for Modbus OUT connection
-#define MB_DEV_SPEED (115200)               // The communication speed of the UART
 
 static const char *TAG = "MODBUS_FIREWALL";
 
-/* Write the firewall function rule */
-static char firewall_rule(unsigned char addr, unsigned char *frame, unsigned short len) {
+#define MB_FRAME_FUNCTION_CODE 0
+#define MB_FRAME_DATA 1
 
-    ESP_LOGD(TAG, "Firewall rule\n");
-    ESP_LOGD(TAG, "Packet inspection\n");
-    ESP_LOGD(TAG, "Address %hhu\n", addr);
-    ESP_LOGD(TAG, "Len %hu\n", len);
-    if (addr != 4) {
-        return true;
-    } else
-        return false;
+#define MB_FIREWALL_MAX_RULES 16
+
+// |  1B  |   2B  |    2B   |  REST  |
+// | ADDR | FCODE |  SADDR  |  DATA  |
+
+typedef enum mb_firewall_rule_result {
+    FIREWALL_FAIL = 0,
+    FIREWALL_PASS
+} mb_firewall_rule_result_t;
+
+typedef mb_firewall_rule_result_t ( *mb_firewall_rule_handler )(uint8_t *, uint16_t);
+
+typedef struct mb_firewall_rule {
+    unsigned char mb_function_code;
+    mb_firewall_rule_handler handler;
+} mb_firewall_rule_t;
+
+
+/* Pass everything */
+static mb_firewall_rule_result_t pass(uint8_t *frame, uint16_t len) {
+    ESP_LOGI(TAG, "Function code handler");
+    return FIREWALL_PASS;
 }
 
-void app_main() {
-    /* Set esp log level */
-    esp_log_level_set(TAG, ESP_LOG_VERBOSE);
+mb_firewall_rule_t firewall_rules[MB_FIREWALL_MAX_RULES] = {
+    {MB_FUNC_OTHER_REPORT_SLAVEID, pass},
+    {MB_FUNC_READ_INPUT_REGISTER, pass},
+    {MB_FUNC_READ_HOLDING_REGISTER, pass},
+    {MB_FUNC_WRITE_MULTIPLE_REGISTERS, pass},
+    {MB_FUNC_WRITE_REGISTER, pass},
+    {MB_FUNC_READWRITE_MULTIPLE_REGISTERS, pass},
+    {MB_FUNC_READ_COILS, pass},
+    {MB_FUNC_WRITE_SINGLE_COIL, pass},
+    {MB_FUNC_WRITE_MULTIPLE_COILS, pass},
+    {MB_FUNC_READ_DISCRETE_INPUTS, pass},
+};
 
-    printf("Hello there here is the firewall main app.\n");
 
-    /* Firewall handler */
-    void *handler = NULL;
+/* Write the firewall function rule */
+static char firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
 
-    ESP_ERROR_CHECK(mbc_firewall_init(MB_PORT_SERIAL_FIREWALL, &handler));
-    ESP_LOGI(TAG, "Firewall started\n");
+    uint8_t function_code = frame[MB_FRAME_FUNCTION_CODE];
+    mb_firewall_rule_result_t status = FIREWALL_PASS;
 
-    /* Cannot make it generic, different from modbus slave and master */
-    mb_firewall_comm_info_t firewall_comm_info = {
-        .mode_input = MB_MODE_RTU,       /* Modbus communication mode INPUT */
-        .mode_output = MB_MODE_RTU,      /* Modbus communication mode OUTPUT */
-        .port_input = MB_PORT_NUM_IN,    /* Modbus communication port (UART) INPUT number */
-        .port_output = MB_PORT_NUM_OUT,  /* Modbus communication port (UART) OUTPUT number */
-        .baudrate_input = MB_DEV_SPEED,  /* Modbus baudrate INTPUT */
-        .baudrate_output = MB_DEV_SPEED, /* Modbus baudrate OUTPUT */
-        .parity_input = MB_PARITY_NONE,  /* Modbus UART parity settings INPUT */
-        .parity_output = MB_PARITY_NONE, /* Modbus UART parity settings OUTPUT */
-        .packet_handler = &firewall_rule, /* Modbus firewall filter function */
-    };
+    uint8_t rule_index;
+    ESP_LOGI(TAG, "Firewall checker - packet inspection");
+    ESP_LOGI(TAG, "addr %02X, len %hu, fcode %02X", addr, len, function_code);
 
-    /* Setting up the firewall info */
-    ESP_ERROR_CHECK(mbc_firewall_setup(&firewall_comm_info));
+    /* Waterfall scheme firewall */
 
-    /* Setup the ports */
-    ESP_ERROR_CHECK(uart_set_pin(MB_PORT_NUM_IN, CONFIG_MB_FIREWALL_IN_UART_TXD,
-                                 CONFIG_MB_FIREWALL_IN_UART_RXD, UART_PIN_NO_CHANGE,
-                                 UART_PIN_NO_CHANGE));
+    /* Destination address check */
+    if (addr == 4) {
+        return FIREWALL_FAIL;
+    }
 
-    ESP_ERROR_CHECK(uart_set_pin(MB_PORT_NUM_OUT, CONFIG_MB_FIREWALL_OUT_UART_TXD,
-                                 CONFIG_MB_FIREWALL_OUT_UART_RXD, UART_PIN_NO_CHANGE,
-                                 UART_PIN_NO_CHANGE));
+    for (rule_index = 0; rule_index < MB_FIREWALL_MAX_RULES; rule_index++) {
+        /* Handle the rule found for the function code */
+        if (firewall_rules[rule_index].mb_function_code == function_code) {
 
-    ESP_ERROR_CHECK(mbc_firewall_start());
+            uint8_t *frame_data = &frame[MB_FRAME_DATA];
 
-    // ESP_ERROR_CHECK(mbc_firewall_destroy());
+            return firewall_rules[rule_index].handler(frame_data, len - 1);
+        }
+    }
 
-    // ESP_LOGI(TAG, "Firewall distroyed\n");
+    ESP_LOGI(TAG, "function code unknown %02X", function_code);
+
+    return FIREWALL_FAIL;
 }
