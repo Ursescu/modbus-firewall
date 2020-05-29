@@ -1,6 +1,5 @@
 
 #include "firewall.h"
-#include "modbus.h"
 
 /* Allow to see verbose output logging */
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
