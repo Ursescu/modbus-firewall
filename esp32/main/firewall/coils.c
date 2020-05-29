@@ -40,8 +40,6 @@ mb_firewall_stat_t mb_firewall_read_coils(uint8_t *frame, uint16_t len) {
 
     uint16_t reg_addr;
     uint16_t coil_count;
-    uint8_t ucNBytes;
-    uint8_t *frame_cur;
 
     if (len == (MB_PDU_FUNC_READ_SIZE + MB_PDU_SIZE_MIN)) {
         reg_addr = (uint16_t)(frame[MB_PDU_FUNC_READ_ADDR_OFF] << 8);
@@ -57,25 +55,9 @@ mb_firewall_stat_t mb_firewall_read_coils(uint8_t *frame, uint16_t len) {
         if ((coil_count >= 1) &&
             (coil_count < MB_PDU_FUNC_READ_COILCNT_MAX)) {
             /* Set the current PDU data pointer to the beginning. */
-            frame_cur = &frame[MB_PDU_FUNC_OFF];
-            len = MB_PDU_FUNC_OFF;
-
-            /* First byte contains the function code. */
-            *frame_cur++ = MB_FUNC_READ_COILS;
-            len += 1;
-
-            /* Test if the quantity of coils is a multiple of 8. If not last
-             * byte is only partially field with unused coils set to zero. */
-            if ((coil_count & 0x0007) != 0) {
-                ucNBytes = (uint8_t)(coil_count / 8 + 1);
-            } else {
-                ucNBytes = (uint8_t)(coil_count / 8);
-            }
-            *frame_cur++ = ucNBytes;
-            len += 1;
 
             found =
-                firewall_find_coil_rule(frame_cur, reg_addr, coil_count,
+                firewall_find_coil_rule(NULL, reg_addr, coil_count,
                               FIREWALL_REG_READ);
 
         } else {
