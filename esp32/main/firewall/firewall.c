@@ -34,63 +34,6 @@ static inline mb_firewall_stat_t mb_firewall_fail(uint8_t *frame, uint16_t len) 
     return FIREWALL_FAIL;
 }
 
-/* Function that implements the firewall rules defined in generated */
-
-static mb_firewall_stat_t mb_firewall_read_coils(uint8_t *frame, uint16_t len) {
-    ESP_LOGI(TAG, "read coils handler");
-    uint8_t found = 0;
-
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-}
-
-static mb_firewall_stat_t mb_firewall_write_single_coil(uint8_t *frame, uint16_t len) {
-    ESP_LOGI(TAG, "wirte single coil handler");
-    uint8_t found = 0;
-
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
-}
-
-static mb_firewall_stat_t mb_firewall_write_multiple_coils(uint8_t *frame, uint16_t len) {
-    ESP_LOGI(TAG, "wirte mutiple coils handler");
-    uint8_t found = 0;
-
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
-}
-
 mb_firewall_func_t mb_firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_OTHER_REPORT_SLAVEID, mb_firewall_pass},
     {MB_FUNC_READ_INPUT_REGISTER, mb_firewall_pass},
