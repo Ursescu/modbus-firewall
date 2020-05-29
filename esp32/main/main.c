@@ -11,7 +11,7 @@
 
 #include "esp_log.h"
 #include "mbcontroller.h"
-#include "firewall.h"
+#include "mbfirewall.h"
 
 #define MB_PORT_NUM_IN (UART_NUM_MAX - 1)   // Number of UART port used for Modbus IN connection
 #define MB_PORT_NUM_OUT (UART_NUM_MAX - 2)  // Number of UART port used for Modbus OUT connection

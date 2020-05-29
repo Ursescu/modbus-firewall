@@ -1,9 +1,11 @@
 idf_component_register(
     SRCS
-        "firewall.c"
         "main.c"
-        "generated.c"
+        "firewall/generated.c"
+        "firewall/coils.c"
+        "firewall/firewall.c"
     INCLUDE_DIRS
+        "firewall/include"
         ${CMAKE_CURRENT_LIST_DIR}
         $ENV{IDF_PATH}/components
     REQUIRES
