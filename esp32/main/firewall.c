@@ -112,12 +112,15 @@ char mb_firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len
     uint8_t index;
     int8_t handler_index = MB_FIREWALL_NO_HANDLER;
 
-    ESP_LOGI(TAG, "packet received: addr 0x%02X, len %hu, fcode 0x%02X", addr, len, function_code);
+    ESP_LOGI(TAG, "packet received: addr 0x%02X, len %hu, fcode 0x%02X, firewall mode %s",
+             addr, len, function_code, firewall_type == FIREWALL_WHITELIST ? "W" : "B");
 
     /* Destination address check */
     status = mb_firewall_address_handler(addr);
-    if (!status)
+    if (!status) {
+        ESP_LOGI(TAG, "address not allowed 0x%02X", addr);
         return FIREWALL_FAIL;
+    }
 
     /* Search the handler for the requested code */
     for (index = 0; index < MB_FUNC_HANDLERS_MAX; index++) {
