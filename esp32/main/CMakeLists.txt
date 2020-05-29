@@ -2,8 +2,11 @@ idf_component_register(
     SRCS
         "main.c"
         "firewall/generated.c"
-        "firewall/coils.c"
         "firewall/firewall.c"
+        "firewall/coils.c"
+        "firewall/discrete.c"
+        "firewall/inputs.c"
+        "firewall/holdings.c"
     INCLUDE_DIRS
         "firewall/include"
         ${CMAKE_CURRENT_LIST_DIR}
