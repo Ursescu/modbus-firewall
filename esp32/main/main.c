@@ -36,7 +36,7 @@ void app_main() {
         .baudrate_output = MB_DEV_SPEED, /* Modbus baudrate OUTPUT */
         .parity_input = MB_PARITY_NONE,  /* Modbus UART parity settings INPUT */
         .parity_output = MB_PARITY_NONE, /* Modbus UART parity settings OUTPUT */
-        .packet_handler = &firewall_cb, /* Modbus firewall filter function */
+        .packet_handler = &mb_firewall_cb, /* Modbus firewall filter function */
     };
 
     /* Setting up the firewall info */

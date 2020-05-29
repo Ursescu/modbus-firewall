@@ -62,7 +62,7 @@ static mb_firewall_stat_t mb_firewall_fail(uint8_t *frame, uint16_t len) {
     return FIREWALL_FAIL;
 }
 
-mb_firewall_func_t firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
+mb_firewall_func_t mb_firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_OTHER_REPORT_SLAVEID, mb_firewall_pass},
     {MB_FUNC_READ_INPUT_REGISTER, mb_firewall_pass},
     {MB_FUNC_READ_HOLDING_REGISTER, mb_firewall_pass},
@@ -104,7 +104,7 @@ static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
 /* Firewall callback function implementation, based on liniar lookup tables
  * Implementation based on Waterfall design. Step by step checking.
  */
-char firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
+char mb_firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
 
     uint8_t function_code = frame[MB_PDU_FUNC_OFF];
     mb_firewall_stat_t status = FIREWALL_PASS;
@@ -121,7 +121,7 @@ char firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
 
     /* Search the handler for the requested code */
     for (index = 0; index < MB_FUNC_HANDLERS_MAX; index++) {
-        if (firewall_function_handlers[index].mb_function_code == function_code) {
+        if (mb_firewall_function_handlers[index].mb_function_code == function_code) {
             handler_index = index;
             break;
         }
@@ -133,7 +133,7 @@ char firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len) {
     }
 
     /* Call the function handler for requested code */
-    status = firewall_function_handlers[handler_index].handler(frame, len);
+    status = mb_firewall_function_handlers[handler_index].handler(frame, len);
     if (!status)
         return FIREWALL_FAIL;
 
