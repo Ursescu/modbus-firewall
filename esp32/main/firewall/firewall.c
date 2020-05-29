@@ -43,7 +43,7 @@ mb_firewall_func_t mb_firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_READ_COILS, mb_firewall_read_coils},
     {MB_FUNC_WRITE_SINGLE_COIL, mb_firewall_write_single_coil},
     {MB_FUNC_WRITE_MULTIPLE_COILS, mb_firewall_write_multiple_coils},
-    {MB_FUNC_READ_DISCRETE_INPUTS, mb_firewall_pass},
+    {MB_FUNC_READ_DISCRETE_INPUTS, mb_firewall_read_discrete_inputs},
 };
 
 static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
