@@ -49,7 +49,7 @@ mb_firewall_func_t mb_firewall_function_handlers[MB_FUNC_HANDLERS_MAX] = {
 static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
     ESP_LOGI(TAG, "address handler");
     uint8_t addr_index;
-    uint8_t found = 0;
+    firewall_match_t found = FIREWALL_RULE_NOT_FOUND;
 
     for (addr_index = 0; addr_index < MB_FIREWALL_MAX_ADDRS; addr_index++) {
         if (firewall_addresses[addr_index] == addr) {
@@ -60,10 +60,10 @@ static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
 
     switch (firewall_type) {
         case FIREWALL_BLACKLIST:
-            return found ? FIREWALL_FAIL : FIREWALL_PASS;
+            return found == FIREWALL_RULE_FOUND? FIREWALL_FAIL : FIREWALL_PASS;
             break;
         case FIREWALL_WHITELIST:
-            return found ? FIREWALL_PASS : FIREWALL_FAIL;
+            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
             break;
         default:
             ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
