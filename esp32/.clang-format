@@ -9,3 +9,4 @@ PointerBindsToType: false
 ColumnLimit: 0
 SpaceBeforeParens: ControlStatements
 SortIncludes: false
+AlignConsecutiveMacros: true
