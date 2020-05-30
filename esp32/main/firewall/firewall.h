@@ -31,8 +31,7 @@
 
 #define MB_FIREWALL_NO_HANDLER -1
 
-typedef enum mb_firewall_reg_mode
-{
+typedef enum mb_firewall_reg_mode {
     FIREWALL_REG_READ,
     FIREWALL_REG_WRITE
 } mb_firewall_reg_mode_t;
@@ -62,12 +61,10 @@ typedef struct mb_firewall_func {
 typedef struct mb_firewall_rule {
 } mb_firewall_rule_t;
 
-
 typedef enum firewall_match {
     FIREWALL_RULE_NOT_FOUND = 0,
     FIREWALL_RULE_FOUND = 1,
 } firewall_match_t;
-
 
 /* Coils defines */
 
@@ -91,6 +88,5 @@ mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t le
 mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t len);
 
 mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uint16_t len);
-
 
 #endif

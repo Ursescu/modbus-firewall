@@ -56,7 +56,7 @@ mb_firewall_stat_t mb_firewall_read_input_registers(uint8_t *frame, uint16_t len
          * is incorrect. */
         return FIREWALL_FAIL;
     }
-    
+
     switch (firewall_type) {
         case FIREWALL_BLACKLIST:
             return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;

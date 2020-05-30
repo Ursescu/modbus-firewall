@@ -60,7 +60,7 @@ static mb_firewall_stat_t mb_firewall_address_handler(uint8_t addr) {
 
     switch (firewall_type) {
         case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND? FIREWALL_FAIL : FIREWALL_PASS;
+            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
             break;
         case FIREWALL_WHITELIST:
             return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;

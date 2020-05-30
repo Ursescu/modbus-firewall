@@ -27,8 +27,8 @@ static const char *TAG = "MB_FIREWALL_COILS";
 extern mb_firewall_mode_t firewall_type;
 
 /* Searching through the generated rules for the coils */
-static firewall_match_t firewall_find_coil_rule(uint8_t* reg_buffer, uint16_t reg_addr, uint16_t coil_count, mb_firewall_reg_mode_t mode ) {
-    ESP_LOGI(TAG, "find coil rule: reg 0x%04X, count %hu, mode %s",reg_addr, coil_count, mode == FIREWALL_REG_READ ? "R" : "W");
+static firewall_match_t firewall_find_coil_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t coil_count, mb_firewall_reg_mode_t mode) {
+    ESP_LOGI(TAG, "find coil rule: reg 0x%04X, count %hu, mode %s", reg_addr, coil_count, mode == FIREWALL_REG_READ ? "R" : "W");
 
     return FIREWALL_RULE_NOT_FOUND;
 }
@@ -58,7 +58,7 @@ mb_firewall_stat_t mb_firewall_read_coils(uint8_t *frame, uint16_t len) {
 
             found =
                 firewall_find_coil_rule(NULL, reg_addr, coil_count,
-                              FIREWALL_REG_READ);
+                                        FIREWALL_REG_READ);
 
         } else {
             return FIREWALL_FAIL;
@@ -97,7 +97,6 @@ mb_firewall_stat_t mb_firewall_write_single_coil(uint8_t *frame, uint16_t len) {
         if ((frame[MB_PDU_FUNC_WRITE_VALUE_OFF + 1] == 0x00) &&
             ((frame[MB_PDU_FUNC_WRITE_VALUE_OFF] == 0xFF) ||
              (frame[MB_PDU_FUNC_WRITE_VALUE_OFF] == 0x00))) {
-
             buf[1] = 0;
             if (frame[MB_PDU_FUNC_WRITE_VALUE_OFF] == 0xFF) {
                 buf[0] = 1;
@@ -139,7 +138,6 @@ mb_firewall_stat_t mb_firewall_write_multiple_coils(uint8_t *frame, uint16_t len
     uint8_t byte_count;
     uint8_t byte_count_verify;
 
-
     if (len > (MB_PDU_FUNC_WRITE_SIZE + MB_PDU_SIZE_MIN)) {
         reg_addr = (uint16_t)(frame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF] << 8);
         reg_addr |= (uint16_t)(frame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF + 1]);
@@ -162,7 +160,7 @@ mb_firewall_stat_t mb_firewall_write_multiple_coils(uint8_t *frame, uint16_t len
             (byte_count_verify == byte_count)) {
             found =
                 firewall_find_coil_rule(&frame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                              reg_addr, coil_count, FIREWALL_REG_WRITE);
+                                        reg_addr, coil_count, FIREWALL_REG_WRITE);
 
         } else {
             return FIREWALL_FAIL;
