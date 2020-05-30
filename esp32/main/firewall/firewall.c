@@ -120,7 +120,10 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
                     /* Nothing here */
                     break;
             }
+
+            ESP_LOGI(TAG, "data to check 0x%04X\n", data);
         }
+
 
         for (rule_idx = 0; rule_idx < MB_FIREWALL_MAX_RULES; rule_idx++) {
             mb_firewall_rule_t temp_rule = rule_table[rule_idx];
@@ -178,7 +181,7 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
             /* Break the rule searching, allready found one rule that matched it */
             if (match) {
                 rule_policy = temp_rule.policy;
-                ESP_LOGI(TAG, "found rule (%s): reg_addr 0x%04X, table offset %hu", rule_policy == MB_FIREWALL_WHITELIST ? "WHITE" : "BLACK", reg_addr, rule_idx);
+                ESP_LOGI(TAG, "rule found (%s): reg_addr 0x%04X, table offset %hu", rule_policy == MB_FIREWALL_WHITELIST ? "WHITE" : "BLACK", reg_addr, rule_idx);
                 break;
             }
         }
@@ -188,11 +191,12 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
 
         if (!match) {
             rule_policy = firewall_default_policy;
-            ESP_LOGI(TAG, "not found rule: using default policy (%s), reg_addr 0x%04X", rule_policy == MB_FIREWALL_WHITELIST ? "WHITE" : "BLACK", reg_addr);
+            ESP_LOGI(TAG, "rule not found: using default policy (%s), reg_addr 0x%04X", rule_policy == MB_FIREWALL_WHITELIST ? "WHITE" : "BLACK", reg_addr);
         }
 
         if (rule_policy != policy_history) {
             /* Have multiple rules with different policies, need to drop the packet */
+            ESP_LOGI(TAG, "packet dropped, mixed policies\n");
             return MB_FIREWALL_FAIL;
         }
 
@@ -203,9 +207,10 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
     /* If the overall policy is whitelist, then pass the packet, otherwise drop */
     switch (policy_history) {
         case MB_FIREWALL_WHITELIST:
-            ESP_LOGI(TAG, "packet allowed");
+            ESP_LOGI(TAG, "packet passed");
             return MB_FIREWALL_PASS;
         default:
+            ESP_LOGI(TAG, "packet dropped");
             return MB_FIREWALL_FAIL;
     }
 }
