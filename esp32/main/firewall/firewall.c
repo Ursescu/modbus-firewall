@@ -93,7 +93,7 @@ char mb_firewall_cb(unsigned char addr, unsigned char *frame, unsigned short len
 
     /* Search the handler for the requested code */
     for (index = 0; index < MB_FUNC_HANDLERS_MAX; index++) {
-        if (mb_firewall_function_handlers[index].mb_function_code == function_code) {
+        if (mb_firewall_function_handlers[index].function_code == function_code) {
             handler_index = index;
             break;
         }

@@ -54,7 +54,7 @@ typedef enum mb_firewall_stat {
 typedef mb_firewall_stat_t (*mb_firewall_func_handler)(uint8_t *, uint16_t);
 
 typedef struct mb_firewall_func {
-    uint8_t mb_function_code;
+    uint8_t function_code;
     mb_firewall_func_handler handler;
 } mb_firewall_func_t;
 
