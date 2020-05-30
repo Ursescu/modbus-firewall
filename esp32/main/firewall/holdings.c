@@ -32,7 +32,7 @@
 
 static const char *TAG = "MB_FIREWALL_HOLDINGS";
 
-extern mb_firewall_mode_t firewall_type;
+extern mb_firewall_policy_t firewall_type;
 
 /* Searching through the generated rules for the holdings */
 static firewall_match_t firewall_find_holding_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t holding_count, mb_firewall_reg_mode_t mode) {

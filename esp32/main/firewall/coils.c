@@ -24,7 +24,9 @@
 
 static const char *TAG = "MB_FIREWALL_COILS";
 
-extern mb_firewall_mode_t firewall_type;
+extern mb_firewall_policy_t firewall_default_policy;
+
+extern mb_firewall_rule_t firewall_coil_rules[MB_FIREWALL_MAX_RULES];
 
 /* Searching through the generated rules for the coils */
 static firewall_match_t firewall_find_coil_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t coil_count, mb_firewall_reg_mode_t mode) {

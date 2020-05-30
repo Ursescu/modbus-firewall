@@ -39,10 +39,12 @@ typedef enum mb_firewall_reg_mode {
 /* Defines and typedefs for the firewall rule system */
 #define MB_FIREWALL_MAX_ADDRS 32
 
-typedef enum mb_firewall_mode {
+#define MB_FIREWALL_MAX_RULES 64
+
+typedef enum mb_firewall_policy {
     FIREWALL_WHITELIST = 0,
     FIREWALL_BLACKLIST
-} mb_firewall_mode_t;
+} mb_firewall_policy_t;
 
 typedef uint8_t mb_firewall_adress_t;
 

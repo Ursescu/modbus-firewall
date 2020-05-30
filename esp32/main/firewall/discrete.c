@@ -14,7 +14,7 @@
 
 static const char *TAG = "MB_FIREWALL_DISCRETE";
 
-extern mb_firewall_mode_t firewall_type;
+extern mb_firewall_policy_t firewall_default_policy;
 
 /* Searching through the generated rules for the discrets */
 static firewall_match_t firewall_find_discret_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t discrete_count) {

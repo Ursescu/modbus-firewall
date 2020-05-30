@@ -11,8 +11,8 @@ static const char *TAG = "MB_FIREWALL";
 // | ADDR | FCODE |  SADDR  |  DATA  |
 
 /* External firewall type */
-extern mb_firewall_mode_t firewall_type;
-extern mb_firewall_adress firewall_addresses[MB_FIREWALL_MAX_ADDRS];
+extern mb_firewall_policy_t firewall_type;
+extern mb_firewall_adress_t firewall_addresses[MB_FIREWALL_MAX_ADDRS];
 
 /* 
  *  
