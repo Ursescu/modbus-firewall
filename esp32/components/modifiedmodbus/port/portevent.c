@@ -56,52 +56,39 @@
 /* ----------------------- Variables ----------------------------------------*/
 static xQueueHandle xQueueHdl;
 
-#define MB_EVENT_QUEUE_SIZE     (1)
-#define MB_EVENT_QUEUE_TIMEOUT  (pdMS_TO_TICKS(CONFIG_FMB_EVENT_QUEUE_TIMEOUT))
+#define MB_EVENT_QUEUE_SIZE    (1)
+#define MB_EVENT_QUEUE_TIMEOUT (pdMS_TO_TICKS(CONFIG_FMB_EVENT_QUEUE_TIMEOUT))
 
 /* ----------------------- Start implementation -----------------------------*/
-BOOL
-xMBPortEventInit( void )
-{
+BOOL xMBPortEventInit(void) {
     BOOL bStatus = FALSE;
-    if((xQueueHdl = xQueueCreate(MB_EVENT_QUEUE_SIZE, sizeof(eMBEventType))) != NULL)
-    {
+    if ((xQueueHdl = xQueueCreate(MB_EVENT_QUEUE_SIZE, sizeof(eMBEventType))) != NULL) {
         vQueueAddToRegistry(xQueueHdl, "MbPortEventQueue");
         bStatus = TRUE;
     }
     return bStatus;
 }
 
-void
-vMBPortEventClose( void )
-{
-    if(xQueueHdl != NULL)
-    {
+void vMBPortEventClose(void) {
+    if (xQueueHdl != NULL) {
         vQueueDelete(xQueueHdl);
         xQueueHdl = NULL;
     }
 }
 
-BOOL
-xMBPortEventPost( eMBEventType eEvent )
-{
+BOOL xMBPortEventPost(eMBEventType eEvent) {
     BOOL bStatus = TRUE;
     assert(xQueueHdl != NULL);
-    
-    if( (BOOL)xPortInIsrContext() == TRUE )
-    {
+
+    if ((BOOL)xPortInIsrContext() == TRUE) {
         xQueueSendFromISR(xQueueHdl, (const void*)&eEvent, pdFALSE);
-    }
-    else
-    {
+    } else {
         xQueueSend(xQueueHdl, (const void*)&eEvent, MB_EVENT_QUEUE_TIMEOUT);
     }
     return bStatus;
 }
 
-BOOL
-xMBPortEventGet(eMBEventType * peEvent)
-{
+BOOL xMBPortEventGet(eMBEventType* peEvent) {
     assert(xQueueHdl != NULL);
     BOOL xEventHappened = FALSE;
 
@@ -112,12 +99,10 @@ xMBPortEventGet(eMBEventType * peEvent)
 }
 
 xQueueHandle
-xMBPortEventGetHandle(void)
-{
-    if(xQueueHdl != NULL) //
+xMBPortEventGetHandle(void) {
+    if (xQueueHdl != NULL)  //
     {
         return xQueueHdl;
     }
     return NULL;
 }
-

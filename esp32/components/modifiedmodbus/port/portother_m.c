@@ -60,28 +60,21 @@ static UCHAR ucPortMode = 0;
 /* ----------------------- Start implementation -----------------------------*/
 
 UCHAR
-ucMBPortGetMode( void )
-{
+ucMBPortGetMode(void) {
     return ucPortMode;
 }
 
-void
-vMBPortSetMode( UCHAR ucMode )
-{
+void vMBPortSetMode(UCHAR ucMode) {
     ENTER_CRITICAL_SECTION();
     ucPortMode = ucMode;
     EXIT_CRITICAL_SECTION();
 }
 
-
-void
-vMBMasterPortClose( void )
-{
-    extern void     vMBMasterPortSerialClose( void );
-    extern void     vMBMasterPortTimerClose( void );
-    extern void     vMBMasterPortEventClose( void );
-    vMBMasterPortSerialClose(  );
-    vMBMasterPortTimerClose(  );
-    vMBMasterPortEventClose(  );
+void vMBMasterPortClose(void) {
+    extern void vMBMasterPortSerialClose(void);
+    extern void vMBMasterPortTimerClose(void);
+    extern void vMBMasterPortEventClose(void);
+    vMBMasterPortSerialClose();
+    vMBMasterPortTimerClose();
+    vMBMasterPortEventClose();
 }
-

@@ -19,18 +19,18 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/xtensa_api.h"
 #include "freertos/portmacro.h"
-#include "esp_log.h"                // for ESP_LOGE macro
+#include "esp_log.h"  // for ESP_LOGE macro
 
-#define INLINE                      inline
-#define PR_BEGIN_EXTERN_C           extern "C" {
-#define PR_END_EXTERN_C             }
+#define INLINE            inline
+#define PR_BEGIN_EXTERN_C extern "C" {
+#define PR_END_EXTERN_C   }
 
 #define MB_PORT_TAG "MB_PORT_COMMON"
 
-#define MB_PORT_CHECK(a, ret_val, str, ...) \
-    if (!(a)) { \
+#define MB_PORT_CHECK(a, ret_val, str, ...)                                           \
+    if (!(a)) {                                                                       \
         ESP_LOGE(MB_PORT_TAG, "%s(%u): " str, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-        return (ret_val); \
+        return (ret_val);                                                             \
     }
 
 #ifdef __cplusplus
@@ -38,32 +38,38 @@ PR_BEGIN_EXTERN_C
 #endif /* __cplusplus */
 
 #ifndef TRUE
-#define TRUE            1
+#define TRUE 1
 #endif
 
 #ifndef FALSE
-#define FALSE           0
+#define FALSE 0
 #endif
 
-typedef char    BOOL;
+typedef char BOOL;
 
 typedef unsigned char UCHAR;
-typedef char    CHAR;
+typedef char CHAR;
 
 typedef unsigned short USHORT;
-typedef short   SHORT;
+typedef short SHORT;
 
 typedef unsigned long ULONG;
-typedef long    LONG;
+typedef long LONG;
 
-void vMBPortEnterCritical( );
-void vMBPortExitCritical( );
+void vMBPortEnterCritical();
+void vMBPortExitCritical();
 
-#define ENTER_CRITICAL_SECTION( ) { ESP_LOGD(MB_PORT_TAG,"%s: Port enter critical.", __func__); \
-                                    vMBPortEnterCritical(); }
+#define ENTER_CRITICAL_SECTION()                                     \
+    {                                                                \
+        ESP_LOGD(MB_PORT_TAG, "%s: Port enter critical.", __func__); \
+        vMBPortEnterCritical();                                      \
+    }
 
-#define EXIT_CRITICAL_SECTION( )  { vMBPortExitCritical(); \
-                                    ESP_LOGD(MB_PORT_TAG,"%s: Port exit critical", __func__); }
+#define EXIT_CRITICAL_SECTION()                                    \
+    {                                                              \
+        vMBPortExitCritical();                                     \
+        ESP_LOGD(MB_PORT_TAG, "%s: Port exit critical", __func__); \
+    }
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

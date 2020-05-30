@@ -61,25 +61,25 @@ PR_BEGIN_EXTERN_C
  */
 
 /* ----------------------- Defines ------------------------------------------*/
-#define MB_PDU_SIZE_MAX     253 /*!< Maximum size of a PDU. */
-#define MB_PDU_SIZE_MIN     1   /*!< Function Code */
-#define MB_PDU_FUNC_OFF     0   /*!< Offset of function code in PDU. */
-#define MB_PDU_DATA_OFF     1   /*!< Offset for response data in PDU. */
+#define MB_PDU_SIZE_MAX 253 /*!< Maximum size of a PDU. */
+#define MB_PDU_SIZE_MIN 1   /*!< Function Code */
+#define MB_PDU_FUNC_OFF 0   /*!< Offset of function code in PDU. */
+#define MB_PDU_DATA_OFF 1   /*!< Offset for response data in PDU. */
 
 /* ----------------------- Prototypes  0-------------------------------------*/
-typedef void    ( *pvMBFrameStart ) ( void );
+typedef void (*pvMBFrameStart)(void);
 
-typedef void    ( *pvMBFrameStop ) ( void );
+typedef void (*pvMBFrameStop)(void);
 
-typedef eMBErrorCode( *peMBFrameReceive ) ( UCHAR * pucRcvAddress,
-                                            UCHAR ** pucFrame,
-                                            USHORT * pusLength );
+typedef eMBErrorCode (*peMBFrameReceive)(UCHAR* pucRcvAddress,
+                                         UCHAR** pucFrame,
+                                         USHORT* pusLength);
 
-typedef eMBErrorCode( *peMBFrameSend ) ( UCHAR slaveAddress,
-                                         const UCHAR * pucFrame,
-                                         USHORT usLength );
+typedef eMBErrorCode (*peMBFrameSend)(UCHAR slaveAddress,
+                                      const UCHAR* pucFrame,
+                                      USHORT usLength);
 
-typedef void( *pvMBFrameClose ) ( void );
+typedef void (*pvMBFrameClose)(void);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

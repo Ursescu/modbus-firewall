@@ -18,11 +18,11 @@
 #ifndef _MODBUS_SERIAL_CONTROLLER_MASTER
 #define _MODBUS_SERIAL_CONTROLLER_MASTER
 
-#include <stdint.h>                 // for standard int types definition
-#include <stddef.h>                 // for NULL and std defines
-#include "soc/soc.h"                // for BITN definitions
-#include "esp_err.h"                // for esp_err_t
-#include "esp_modbus_common.h"      // for common defines
+#include <stdint.h>             // for standard int types definition
+#include <stddef.h>             // for NULL and std defines
+#include "soc/soc.h"            // for BITN definitions
+#include "esp_err.h"            // for esp_err_t
+#include "esp_modbus_common.h"  // for common defines
 
 /**
  * @brief Initialize Modbus controller and stack
@@ -34,5 +34,4 @@
  */
 esp_err_t mbc_serial_master_create(mb_port_type_t port_type, void** handler);
 
-#endif // _MODBUS_SERIAL_CONTROLLER_MASTER
-
+#endif  // _MODBUS_SERIAL_CONTROLLER_MASTER

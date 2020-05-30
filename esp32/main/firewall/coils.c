@@ -46,7 +46,7 @@ mb_firewall_stat_t mb_firewall_read_coils(uint8_t *frame, uint16_t len) {
             /* Set the current PDU data pointer to the beginning. */
 
             return firewall_find_rule(NULL, reg_addr, coil_count,
-                                           MB_FIREWALL_REG_READ, MB_FIREWALL_COIL);
+                                      MB_FIREWALL_REG_READ, MB_FIREWALL_COIL);
 
         } else {
             return MB_FIREWALL_FAIL;
@@ -123,7 +123,7 @@ mb_firewall_stat_t mb_firewall_write_multiple_coils(uint8_t *frame, uint16_t len
             (coil_count <= MB_PDU_FUNC_WRITE_MUL_COILCNT_MAX) &&
             (byte_count_verify == byte_count)) {
             return firewall_find_rule(&frame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                                           reg_addr, coil_count, MB_FIREWALL_REG_WRITE, MB_FIREWALL_COIL);
+                                      reg_addr, coil_count, MB_FIREWALL_REG_WRITE, MB_FIREWALL_COIL);
 
         } else {
             return MB_FIREWALL_FAIL;

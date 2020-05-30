@@ -31,7 +31,7 @@
 #ifndef _MB_PORT_H
 #define _MB_PORT_H
 
-#include "mbconfig.h"   // for options
+#include "mbconfig.h"  // for options
 
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
@@ -39,27 +39,26 @@ PR_BEGIN_EXTERN_C
 
 /* ----------------------- Type definitions ---------------------------------*/
 
-typedef enum
-{
-    EV_READY = 0x01,                   /*!< Startup finished. */
-    EV_FRAME_RECEIVED = 0x02,          /*!< Frame received. */
-    EV_EXECUTE = 0x04,                 /*!< Execute function. */
-    EV_FRAME_SENT = 0x08               /*!< Frame sent. */
+typedef enum {
+    EV_READY = 0x01,          /*!< Startup finished. */
+    EV_FRAME_RECEIVED = 0x02, /*!< Frame received. */
+    EV_EXECUTE = 0x04,        /*!< Execute function. */
+    EV_FRAME_SENT = 0x08      /*!< Frame sent. */
 } eMBEventType;
 
 #if MB_MASTER_RTU_ENABLED > 0 || MB_MASTER_ASCII_ENABLED > 0
 typedef enum {
     EV_MASTER_NO_EVENT = 0x0000,
-    EV_MASTER_READY = 0x0001,                   /*!< Startup finished. */
-    EV_MASTER_FRAME_RECEIVED = 0x0002,          /*!< Frame received. */
-    EV_MASTER_EXECUTE = 0x0004,                 /*!< Execute function. */
-    EV_MASTER_FRAME_SENT = 0x0008,              /*!< Frame sent. */
-    EV_MASTER_FRAME_TRANSMITTED = 0x0010,       /*!< Request execute function error. */
-    EV_MASTER_ERROR_PROCESS = 0x0020,           /*!< Frame error process. */
-    EV_MASTER_PROCESS_SUCCESS = 0x0040,         /*!< Request process success. */
-    EV_MASTER_ERROR_RESPOND_TIMEOUT = 0x0080,   /*!< Request respond timeout. */
-    EV_MASTER_ERROR_RECEIVE_DATA = 0x0100,      /*!< Request receive data error. */
-    EV_MASTER_ERROR_EXECUTE_FUNCTION = 0x0200,  /*!< Request execute function error. */
+    EV_MASTER_READY = 0x0001,                  /*!< Startup finished. */
+    EV_MASTER_FRAME_RECEIVED = 0x0002,         /*!< Frame received. */
+    EV_MASTER_EXECUTE = 0x0004,                /*!< Execute function. */
+    EV_MASTER_FRAME_SENT = 0x0008,             /*!< Frame sent. */
+    EV_MASTER_FRAME_TRANSMITTED = 0x0010,      /*!< Request execute function error. */
+    EV_MASTER_ERROR_PROCESS = 0x0020,          /*!< Frame error process. */
+    EV_MASTER_PROCESS_SUCCESS = 0x0040,        /*!< Request process success. */
+    EV_MASTER_ERROR_RESPOND_TIMEOUT = 0x0080,  /*!< Request respond timeout. */
+    EV_MASTER_ERROR_RECEIVE_DATA = 0x0100,     /*!< Request receive data error. */
+    EV_MASTER_ERROR_EXECUTE_FUNCTION = 0x0200, /*!< Request execute function error. */
 } eMBMasterEventType;
 
 typedef enum {
@@ -70,19 +69,18 @@ typedef enum {
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED > 0 || MB_FIREWALL_ASCII_ENABLED > 0
-typedef enum
-{
-    EV_F_READY = 0x01,                   /*!< Startup finished. */
-    EV_F_INPUT_FRAME_RECEIVED = 0x02,          /*!< Frame received. */
-    EV_F_INPUT_EXECUTE = 0x04,                 /*!< Execute function. */
-    EV_F_INPUT_FRAME_SENT = 0x08,               /*!< Frame sent. */
-    EV_F_OUTPUT_FRAME_RECEIVED = 0x10,          /*!< Frame received. */
-    EV_F_OUTPUT_EXECUTE = 0x12,                 /*!< Execute function. */
-    EV_F_OUTPUT_FRAME_SENT = 0x14               /*!< Frame sent. */
+typedef enum {
+    EV_F_READY = 0x01,                 /*!< Startup finished. */
+    EV_F_INPUT_FRAME_RECEIVED = 0x02,  /*!< Frame received. */
+    EV_F_INPUT_EXECUTE = 0x04,         /*!< Execute function. */
+    EV_F_INPUT_FRAME_SENT = 0x08,      /*!< Frame sent. */
+    EV_F_OUTPUT_FRAME_RECEIVED = 0x10, /*!< Frame received. */
+    EV_F_OUTPUT_EXECUTE = 0x12,        /*!< Execute function. */
+    EV_F_OUTPUT_FRAME_SENT = 0x14      /*!< Frame sent. */
 
 } eMBFirewallEventType;
 
-#endif 
+#endif
 
 /*! \ingroup modbus
  * \brief Parity used for characters in serial mode.
@@ -91,152 +89,151 @@ typedef enum
  * link. Please note that this values are actually passed to the porting
  * layer and therefore not all parity modes might be available.
  */
-typedef enum
-{
-    MB_PAR_NONE,                /*!< No parity. */
-    MB_PAR_ODD,                 /*!< Odd parity. */
-    MB_PAR_EVEN                 /*!< Even parity. */
+typedef enum {
+    MB_PAR_NONE, /*!< No parity. */
+    MB_PAR_ODD,  /*!< Odd parity. */
+    MB_PAR_EVEN  /*!< Even parity. */
 } eMBParity;
 
 /* ----------------------- Supporting functions -----------------------------*/
-BOOL            xMBPortEventInit( void );
+BOOL xMBPortEventInit(void);
 
-BOOL            xMBPortEventPost( eMBEventType eEvent );
+BOOL xMBPortEventPost(eMBEventType eEvent);
 
-BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
+BOOL xMBPortEventGet(/*@out@ */ eMBEventType* eEvent);
 
 #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
-BOOL            xMBMasterPortEventInit( void );
+BOOL xMBMasterPortEventInit(void);
 
-BOOL            xMBMasterPortEventPost( eMBMasterEventType eEvent );
+BOOL xMBMasterPortEventPost(eMBMasterEventType eEvent);
 
-BOOL            xMBMasterPortEventGet(  /*@out@ */ eMBMasterEventType * eEvent );
+BOOL xMBMasterPortEventGet(/*@out@ */ eMBMasterEventType* eEvent);
 
-void            vMBMasterOsResInit( void );
+void vMBMasterOsResInit(void);
 
-BOOL            xMBMasterRunResTake( LONG time );
+BOOL xMBMasterRunResTake(LONG time);
 
-void            vMBMasterRunResRelease( void );
-#endif // #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
+void vMBMasterRunResRelease(void);
+#endif  // #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-BOOL            xMBFirewallPortEventInit( void );
+BOOL xMBFirewallPortEventInit(void);
 
-BOOL            xMBFirewallPortEventPost( eMBFirewallEventType eEvent );
+BOOL xMBFirewallPortEventPost(eMBFirewallEventType eEvent);
 
-BOOL            xMBFirewallPortEventGet( eMBFirewallEventType * eEvent );
+BOOL xMBFirewallPortEventGet(eMBFirewallEventType* eEvent);
 #endif
 
 /* ----------------------- Serial port functions ----------------------------*/
 
-BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
-                                   UCHAR ucDataBits, eMBParity eParity );
+BOOL xMBPortSerialInit(UCHAR ucPort, ULONG ulBaudRate,
+                       UCHAR ucDataBits, eMBParity eParity);
 
-void            vMBPortClose( void );
+void vMBPortClose(void);
 
-void            xMBPortSerialClose( void );
+void xMBPortSerialClose(void);
 
-void            vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
+void vMBPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable);
 
-BOOL            xMBPortSerialGetByte( CHAR * pucByte );
+BOOL xMBPortSerialGetByte(CHAR* pucByte);
 
-BOOL            xMBPortSerialPutByte( CHAR ucByte );
+BOOL xMBPortSerialPutByte(CHAR ucByte);
 
 #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
-BOOL            xMBMasterPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
-                                   UCHAR ucDataBits, eMBParity eParity );
+BOOL xMBMasterPortSerialInit(UCHAR ucPort, ULONG ulBaudRate,
+                             UCHAR ucDataBits, eMBParity eParity);
 
-void            vMBMasterPortClose( void );
+void vMBMasterPortClose(void);
 
-void            xMBMasterPortSerialClose( void );
+void xMBMasterPortSerialClose(void);
 
-void            vMBMasterPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
+void vMBMasterPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable);
 
-BOOL            xMBMasterPortSerialGetByte( CHAR * pucByte );
+BOOL xMBMasterPortSerialGetByte(CHAR* pucByte);
 
-BOOL            xMBMasterPortSerialPutByte( CHAR ucByte );
+BOOL xMBMasterPortSerialPutByte(CHAR ucByte);
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-BOOL            xMBFirewallPortSerialInit( UCHAR ucPortInput, ULONG ulBaudRateInput,
-                                   UCHAR ucDataBitsInput, eMBParity eParityInput,
-                                   UCHAR ucPortOutput, ULONG ulBaudRateOutput,
-                                   UCHAR ucDataBitsOutput, eMBParity eParityOutput);
+BOOL xMBFirewallPortSerialInit(UCHAR ucPortInput, ULONG ulBaudRateInput,
+                               UCHAR ucDataBitsInput, eMBParity eParityInput,
+                               UCHAR ucPortOutput, ULONG ulBaudRateOutput,
+                               UCHAR ucDataBitsOutput, eMBParity eParityOutput);
 
-void            vMBFirewallPortClose( void );
+void vMBFirewallPortClose(void);
 
-void            xMBFirewallPortSerialClose( void );
+void xMBFirewallPortSerialClose(void);
 
-void            vMBFirewallInputPortSerialEnable( BOOL xRxEnableInput, BOOL xTxEnableInput);
+void vMBFirewallInputPortSerialEnable(BOOL xRxEnableInput, BOOL xTxEnableInput);
 
-void            vMBFirewallOutputPortSerialEnable(BOOL xRxEnableOutput, BOOL xTxEnableOutput);
+void vMBFirewallOutputPortSerialEnable(BOOL xRxEnableOutput, BOOL xTxEnableOutput);
 
-BOOL            xMBFirewallInputPortSerialGetByte( CHAR * pucByte );
+BOOL xMBFirewallInputPortSerialGetByte(CHAR* pucByte);
 
-BOOL            xMBFirewallOutputPortSerialGetByte( CHAR * pucByte );
+BOOL xMBFirewallOutputPortSerialGetByte(CHAR* pucByte);
 
-BOOL            xMBFirewallInputPortSerialPutByte( CHAR ucByte );
+BOOL xMBFirewallInputPortSerialPutByte(CHAR ucByte);
 
-BOOL            xMBFirewallOutputPortSerialPutByte( CHAR ucByte );
+BOOL xMBFirewallOutputPortSerialPutByte(CHAR ucByte);
 
 #endif
 
 /* ----------------------- Timers functions ---------------------------------*/
-BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
+BOOL xMBPortTimersInit(USHORT usTimeOut50us);
 
-void            xMBPortTimersClose( void );
+void xMBPortTimersClose(void);
 
-void            vMBPortTimersEnable( void );
+void vMBPortTimersEnable(void);
 
-void            vMBPortTimersDisable( void );
+void vMBPortTimersDisable(void);
 
-void            vMBPortTimersDelay( USHORT usTimeOutMS );
+void vMBPortTimersDelay(USHORT usTimeOutMS);
 
 #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
-BOOL            xMBMasterPortTimersInit( USHORT usTimeOut50us );
+BOOL xMBMasterPortTimersInit(USHORT usTimeOut50us);
 
-void            xMBMasterPortTimersClose( void );
+void xMBMasterPortTimersClose(void);
 
-void            vMBMasterPortTimersT35Enable( void );
+void vMBMasterPortTimersT35Enable(void);
 
-void            vMBMasterPortTimersConvertDelayEnable( void );
+void vMBMasterPortTimersConvertDelayEnable(void);
 
-void            vMBMasterPortTimersRespondTimeoutEnable( void );
+void vMBMasterPortTimersRespondTimeoutEnable(void);
 
-void            vMBMasterPortTimersDisable( void );
+void vMBMasterPortTimersDisable(void);
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-BOOL            xMBFirewallPortTimersInit( USHORT usTimeOut50usInput, USHORT usTimeOut50usOutput);
+BOOL xMBFirewallPortTimersInit(USHORT usTimeOut50usInput, USHORT usTimeOut50usOutput);
 
-void            xMBFirewallInputPortTimersClose( void );
+void xMBFirewallInputPortTimersClose(void);
 
-void            xMBFirewallOutputPortTimersClose( void );
+void xMBFirewallOutputPortTimersClose(void);
 
-void            vMBFirewallInputPortTimersEnable( void );
+void vMBFirewallInputPortTimersEnable(void);
 
-void            vMBFirewallOutputPortTimersEnable( void );
+void vMBFirewallOutputPortTimersEnable(void);
 
-void            vMBFirewallInputPortTimersDisable( void );
+void vMBFirewallInputPortTimersDisable(void);
 
-void            vMBFirewallOutputPortTimersDisable( void );
+void vMBFirewallOutputPortTimersDisable(void);
 
-void            vMBFirewallInputPortTimersDelay( USHORT usTimeOutMS );
+void vMBFirewallInputPortTimersDelay(USHORT usTimeOutMS);
 
-void            vMBFirewallOutputPortTimersDelay( USHORT usTimeOutMS );
+void vMBFirewallOutputPortTimersDelay(USHORT usTimeOutMS);
 #endif
 
 /* ----------------- Callback for the master error process ------------------*/
-void            vMBMasterErrorCBRespondTimeout( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                                USHORT ucPDULength );
+void vMBMasterErrorCBRespondTimeout(UCHAR ucDestAddress, const UCHAR* pucPDUData,
+                                    USHORT ucPDULength);
 
-void            vMBMasterErrorCBReceiveData( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                             USHORT ucPDULength );
+void vMBMasterErrorCBReceiveData(UCHAR ucDestAddress, const UCHAR* pucPDUData,
+                                 USHORT ucPDULength);
 
-void            vMBMasterErrorCBExecuteFunction( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                                 USHORT ucPDULength );
+void vMBMasterErrorCBExecuteFunction(UCHAR ucDestAddress, const UCHAR* pucPDUData,
+                                     USHORT ucPDULength);
 
-void            vMBMasterCBRequestSuccess( void );
+void vMBMasterCBRequestSuccess(void);
 
 /* ----------------------- Callback for the protocol stack ------------------*/
 /*!
@@ -251,40 +248,40 @@ void            vMBMasterCBRequestSuccess( void );
  *   a new byte was received. The port implementation should wake up the
  *   tasks which are currently blocked on the eventqueue.
  */
-extern          BOOL( *pxMBFrameCBByteReceived ) ( void );
+extern BOOL (*pxMBFrameCBByteReceived)(void);
 
-extern          BOOL( *pxMBFrameCBTransmitterEmpty ) ( void );
+extern BOOL (*pxMBFrameCBTransmitterEmpty)(void);
 
-extern          BOOL( *pxMBPortCBTimerExpired ) ( void );
+extern BOOL (*pxMBPortCBTimerExpired)(void);
 #if MB_MASTER_RTU_ENABLED || MB_MASTER_ASCII_ENABLED
-extern          BOOL( *pxMBMasterFrameCBByteReceived ) ( void );
+extern BOOL (*pxMBMasterFrameCBByteReceived)(void);
 
-extern          BOOL( *pxMBMasterFrameCBTransmitterEmpty ) ( void );
+extern BOOL (*pxMBMasterFrameCBTransmitterEmpty)(void);
 
-extern          BOOL( *pxMBMasterPortCBTimerExpired ) ( void );
+extern BOOL (*pxMBMasterPortCBTimerExpired)(void);
 #endif
 
 #if MB_FIREWALL_RTU_ENABLED || MB_FIREWALL_ASCII_ENABLED
-extern          BOOL( *pxMBFirewallInputFrameCBByteReceived ) ( void );
-extern          BOOL( *pxMBFirewallOutputFrameCBByteReceived ) ( void );
+extern BOOL (*pxMBFirewallInputFrameCBByteReceived)(void);
+extern BOOL (*pxMBFirewallOutputFrameCBByteReceived)(void);
 
-extern          BOOL( *pxMBFirewallInputFrameCBTransmitterEmpty ) ( void );
-extern          BOOL( *pxMBFirewallOutputFrameCBTransmitterEmpty ) ( void );
+extern BOOL (*pxMBFirewallInputFrameCBTransmitterEmpty)(void);
+extern BOOL (*pxMBFirewallOutputFrameCBTransmitterEmpty)(void);
 
-extern          BOOL( *pxMBFirewallInputPortCBTimerExpired ) ( void );
-extern          BOOL( *pxMBFirewallOutputPortCBTimerExpired ) ( void );
+extern BOOL (*pxMBFirewallInputPortCBTimerExpired)(void);
+extern BOOL (*pxMBFirewallOutputPortCBTimerExpired)(void);
 #endif
 /* ----------------------- TCP port functions -------------------------------*/
 #if MB_TCP_ENABLED
-BOOL            xMBTCPPortInit( USHORT usTCPPort );
+BOOL xMBTCPPortInit(USHORT usTCPPort);
 
-void            vMBTCPPortClose( void );
+void vMBTCPPortClose(void);
 
-void            vMBTCPPortDisable( void );
+void vMBTCPPortDisable(void);
 
-BOOL            xMBTCPPortGetRequest( UCHAR **ppucMBTCPFrame, USHORT * usTCPLength );
+BOOL xMBTCPPortGetRequest(UCHAR** ppucMBTCPFrame, USHORT* usTCPLength);
 
-BOOL            xMBTCPPortSendResponse( const UCHAR *pucMBTCPFrame, USHORT usTCPLength );
+BOOL xMBTCPPortSendResponse(const UCHAR* pucMBTCPFrame, USHORT usTCPLength);
 #endif
 
 #ifdef __cplusplus

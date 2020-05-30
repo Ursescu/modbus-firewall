@@ -58,11 +58,11 @@ PR_BEGIN_EXTERN_C
 
 // BOOL xMBPortSerialTxPoll( void );
 
-BOOL xMBFirewallInputPortSerialTxPoll( void );
+BOOL xMBFirewallInputPortSerialTxPoll(void);
 
-BOOL xMBFirewallOutputPortSerialTxPoll( void );
+BOOL xMBFirewallOutputPortSerialTxPoll(void);
 
-void vMBPortSetMode( UCHAR ucMode );
+void vMBPortSetMode(UCHAR ucMode);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

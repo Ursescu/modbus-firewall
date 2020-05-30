@@ -47,7 +47,7 @@
 /* ----------------------- Platform includes --------------------------------*/
 #include "driver/uart.h"
 #include "driver/timer.h"
-#include "esp_log.h"                // for ESP_LOGE macro
+#include "esp_log.h"  // for ESP_LOGE macro
 #include "mb_m.h"
 #include "port.h"
 
@@ -55,8 +55,8 @@
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif /* __cplusplus */
-   
-void vMBPortSetMode( UCHAR ucMode );
+
+void vMBPortSetMode(UCHAR ucMode);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

@@ -8,8 +8,7 @@ extern mb_firewall_adress_t firewall_addresses[MB_FIREWALL_MAX_ADDRS];
 mb_firewall_policy_t firewall_default_policy = MB_FIREWALL_WHITELIST;
 
 mb_firewall_adress_t firewall_addresses[MB_FIREWALL_MAX_ADDRS] = {
-    10, 15, 1
-};
+    10, 15, 1};
 
 /* Rules for each modbus request type */
 

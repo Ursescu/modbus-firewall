@@ -40,34 +40,32 @@
 #include "mbproto.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define BITS_UCHAR      8U
+#define BITS_UCHAR 8U
 
 /* ----------------------- Start implementation -----------------------------*/
-void
-xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits,
-                UCHAR ucValue )
-{
-    USHORT          usWordBuf;
-    USHORT          usMask;
-    USHORT          usByteOffset;
-    USHORT          usNPreBits;
-    USHORT          usValue = ucValue;
+void xMBUtilSetBits(UCHAR* ucByteBuf, USHORT usBitOffset, UCHAR ucNBits,
+                    UCHAR ucValue) {
+    USHORT usWordBuf;
+    USHORT usMask;
+    USHORT usByteOffset;
+    USHORT usNPreBits;
+    USHORT usValue = ucValue;
 
-    assert( ucNBits <= 8 );
-    assert( ( size_t )BITS_UCHAR == sizeof( UCHAR ) * 8 );
+    assert(ucNBits <= 8);
+    assert((size_t)BITS_UCHAR == sizeof(UCHAR) * 8);
 
     /* Calculate byte offset for first byte containing the bit values starting
      * at usBitOffset. */
-    usByteOffset = ( USHORT )( ( usBitOffset ) / BITS_UCHAR );
+    usByteOffset = (USHORT)((usBitOffset) / BITS_UCHAR);
 
     /* How many bits precede our bits to set. */
-    usNPreBits = ( USHORT )( usBitOffset - usByteOffset * BITS_UCHAR );
+    usNPreBits = (USHORT)(usBitOffset - usByteOffset * BITS_UCHAR);
 
     /* Move bit field into position over bits to set */
     usValue <<= usNPreBits;
 
     /* Prepare a mask for setting the new bits. */
-    usMask = ( USHORT )( ( 1 << ( USHORT ) ucNBits ) - 1 );
+    usMask = (USHORT)((1 << (USHORT)ucNBits) - 1);
     usMask <<= usBitOffset - usByteOffset * BITS_UCHAR;
 
     /* copy bits into temporary storage. */
@@ -75,30 +73,29 @@ xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits,
     usWordBuf |= ucByteBuf[usByteOffset + 1] << BITS_UCHAR;
 
     /* Zero out bit field bits and then or value bits into them. */
-    usWordBuf = ( USHORT )( ( usWordBuf & ( ~usMask ) ) | usValue );
+    usWordBuf = (USHORT)((usWordBuf & (~usMask)) | usValue);
 
     /* move bits back into storage */
-    ucByteBuf[usByteOffset] = ( UCHAR )( usWordBuf & 0xFF );
-    ucByteBuf[usByteOffset + 1] = ( UCHAR )( usWordBuf >> BITS_UCHAR );
+    ucByteBuf[usByteOffset] = (UCHAR)(usWordBuf & 0xFF);
+    ucByteBuf[usByteOffset + 1] = (UCHAR)(usWordBuf >> BITS_UCHAR);
 }
 
 UCHAR
-xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits )
-{
-    USHORT          usWordBuf;
-    USHORT          usMask;
-    USHORT          usByteOffset;
-    USHORT          usNPreBits;
+xMBUtilGetBits(UCHAR* ucByteBuf, USHORT usBitOffset, UCHAR ucNBits) {
+    USHORT usWordBuf;
+    USHORT usMask;
+    USHORT usByteOffset;
+    USHORT usNPreBits;
 
     /* Calculate byte offset for first byte containing the bit values starting
      * at usBitOffset. */
-    usByteOffset = ( USHORT )( ( usBitOffset ) / BITS_UCHAR );
+    usByteOffset = (USHORT)((usBitOffset) / BITS_UCHAR);
 
     /* How many bits precede our bits to set. */
-    usNPreBits = ( USHORT )( usBitOffset - usByteOffset * BITS_UCHAR );
+    usNPreBits = (USHORT)(usBitOffset - usByteOffset * BITS_UCHAR);
 
     /* Prepare a mask for setting the new bits. */
-    usMask = ( USHORT )( ( 1 << ( USHORT ) ucNBits ) - 1 );
+    usMask = (USHORT)((1 << (USHORT)ucNBits) - 1);
 
     /* copy bits into temporary storage. */
     usWordBuf = ucByteBuf[usByteOffset];
@@ -110,16 +107,14 @@ xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits )
     /* mask away bits above the requested bitfield. */
     usWordBuf &= usMask;
 
-    return ( UCHAR ) usWordBuf;
+    return (UCHAR)usWordBuf;
 }
 
 eMBException
-prveMBError2Exception( eMBErrorCode eErrorCode )
-{
-    eMBException    eStatus;
+prveMBError2Exception(eMBErrorCode eErrorCode) {
+    eMBException eStatus;
 
-    switch ( eErrorCode )
-    {
+    switch (eErrorCode) {
         case MB_ENOERR:
             eStatus = MB_EX_NONE;
             break;

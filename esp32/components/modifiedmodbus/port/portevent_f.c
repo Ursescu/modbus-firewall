@@ -56,52 +56,39 @@
 /* ----------------------- Variables ----------------------------------------*/
 static xQueueHandle xQueueHdl;
 
-#define MB_EVENT_QUEUE_SIZE     (1)
-#define MB_EVENT_QUEUE_TIMEOUT  (pdMS_TO_TICKS(CONFIG_FMB_EVENT_QUEUE_TIMEOUT))
+#define MB_EVENT_QUEUE_SIZE    (1)
+#define MB_EVENT_QUEUE_TIMEOUT (pdMS_TO_TICKS(CONFIG_FMB_EVENT_QUEUE_TIMEOUT))
 
 /* ----------------------- Start implementation -----------------------------*/
-BOOL
-xMBFirewallPortEventInit( void )
-{
+BOOL xMBFirewallPortEventInit(void) {
     BOOL bStatus = FALSE;
-    if((xQueueHdl = xQueueCreate(MB_EVENT_QUEUE_SIZE, sizeof(eMBFirewallEventType))) != NULL)
-    {
+    if ((xQueueHdl = xQueueCreate(MB_EVENT_QUEUE_SIZE, sizeof(eMBFirewallEventType))) != NULL) {
         vQueueAddToRegistry(xQueueHdl, "MbFirewallPortEventQueue");
         bStatus = TRUE;
     }
     return bStatus;
 }
 
-void
-vMBFirewallPortEventClose( void )
-{
-    if(xQueueHdl != NULL)
-    {
+void vMBFirewallPortEventClose(void) {
+    if (xQueueHdl != NULL) {
         vQueueDelete(xQueueHdl);
         xQueueHdl = NULL;
     }
 }
 
-BOOL
-xMBFirewallPortEventPost( eMBFirewallEventType eEvent )
-{
+BOOL xMBFirewallPortEventPost(eMBFirewallEventType eEvent) {
     BOOL bStatus = TRUE;
     assert(xQueueHdl != NULL);
-    
-    if( (BOOL)xPortInIsrContext() == TRUE )
-    {
+
+    if ((BOOL)xPortInIsrContext() == TRUE) {
         xQueueSendFromISR(xQueueHdl, (const void*)&eEvent, pdFALSE);
-    }
-    else
-    {
+    } else {
         xQueueSend(xQueueHdl, (const void*)&eEvent, MB_EVENT_QUEUE_TIMEOUT);
     }
     return bStatus;
 }
 
-BOOL
-xMBFirewallPortEventGet(eMBFirewallEventType * peEvent)
-{
+BOOL xMBFirewallPortEventGet(eMBFirewallEventType* peEvent) {
     assert(xQueueHdl != NULL);
     BOOL xEventHappened = FALSE;
 
@@ -112,12 +99,10 @@ xMBFirewallPortEventGet(eMBFirewallEventType * peEvent)
 }
 
 xQueueHandle
-xMBFirewallPortEventGetHandle(void)
-{
-    if(xQueueHdl != NULL) //
+xMBFirewallPortEventGetHandle(void) {
+    if (xQueueHdl != NULL)  //
     {
         return xQueueHdl;
     }
     return NULL;
 }
-

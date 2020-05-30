@@ -46,13 +46,11 @@ static _lock_t s_port_lock;
 
 /* ----------------------- Start implementation -----------------------------*/
 inline void
-vMBPortEnterCritical( )
-{
+vMBPortEnterCritical() {
     _lock_acquire(&s_port_lock);
 }
 
 inline void
-vMBPortExitCritical( )
-{
+vMBPortExitCritical() {
     _lock_release(&s_port_lock);
 }

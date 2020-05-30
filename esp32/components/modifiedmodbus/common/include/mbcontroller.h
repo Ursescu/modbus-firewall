@@ -18,16 +18,15 @@
 #ifndef _MODBUS_CONTROLLER_COMMON
 #define _MODBUS_CONTROLLER_COMMON
 
-#include <stdint.h>                 // for standard int types definition
-#include <stddef.h>                 // for NULL and std defines
-#include "string.h"                 // for strerror()
-#include "errno.h"                  // for errno
-#include "esp_err.h"                // for error handling
-#include "driver/uart.h"                   // for uart port number defines
-#include "sdkconfig.h"              // for KConfig options
+#include <stdint.h>       // for standard int types definition
+#include <stddef.h>       // for NULL and std defines
+#include "string.h"       // for strerror()
+#include "errno.h"        // for errno
+#include "esp_err.h"      // for error handling
+#include "driver/uart.h"  // for uart port number defines
+#include "sdkconfig.h"    // for KConfig options
 
 #include "esp_modbus_master.h"
 #include "esp_modbus_slave.h"
 #include "esp_modbus_firewall.h"
 #endif
-

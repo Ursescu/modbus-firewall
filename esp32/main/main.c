@@ -13,10 +13,9 @@
 #include "mbcontroller.h"
 #include "mbfirewall.h"
 
-#define MB_PORT_NUM_IN (UART_NUM_MAX - 1)   // Number of UART port used for Modbus IN connection
+#define MB_PORT_NUM_IN  (UART_NUM_MAX - 1)  // Number of UART port used for Modbus IN connection
 #define MB_PORT_NUM_OUT (UART_NUM_MAX - 2)  // Number of UART port used for Modbus OUT connection
-#define MB_DEV_SPEED (115200)               // The communication speed of the UART
-
+#define MB_DEV_SPEED    (115200)            // The communication speed of the UART
 
 static const char *TAG = "MAIN";
 
@@ -28,14 +27,14 @@ void app_main() {
 
     /* Cannot make it generic, different from modbus slave and master */
     mb_firewall_comm_info_t firewall_comm_info = {
-        .mode_input = MB_MODE_RTU,       /* Modbus communication mode INPUT */
-        .mode_output = MB_MODE_RTU,      /* Modbus communication mode OUTPUT */
-        .port_input = MB_PORT_NUM_IN,    /* Modbus communication port (UART) INPUT number */
-        .port_output = MB_PORT_NUM_OUT,  /* Modbus communication port (UART) OUTPUT number */
-        .baudrate_input = MB_DEV_SPEED,  /* Modbus baudrate INTPUT */
-        .baudrate_output = MB_DEV_SPEED, /* Modbus baudrate OUTPUT */
-        .parity_input = MB_PARITY_NONE,  /* Modbus UART parity settings INPUT */
-        .parity_output = MB_PARITY_NONE, /* Modbus UART parity settings OUTPUT */
+        .mode_input = MB_MODE_RTU,         /* Modbus communication mode INPUT */
+        .mode_output = MB_MODE_RTU,        /* Modbus communication mode OUTPUT */
+        .port_input = MB_PORT_NUM_IN,      /* Modbus communication port (UART) INPUT number */
+        .port_output = MB_PORT_NUM_OUT,    /* Modbus communication port (UART) OUTPUT number */
+        .baudrate_input = MB_DEV_SPEED,    /* Modbus baudrate INTPUT */
+        .baudrate_output = MB_DEV_SPEED,   /* Modbus baudrate OUTPUT */
+        .parity_input = MB_PARITY_NONE,    /* Modbus UART parity settings INPUT */
+        .parity_output = MB_PARITY_NONE,   /* Modbus UART parity settings OUTPUT */
         .packet_handler = &mb_firewall_cb, /* Modbus firewall filter function */
     };
 

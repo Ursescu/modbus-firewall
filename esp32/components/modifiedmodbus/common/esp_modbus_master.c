@@ -13,34 +13,32 @@
  * limitations under the License.
  */
 
-#include "esp_err.h"            // for esp_err_t
-#include "mbc_master.h"         // for master interface define
-#include "esp_modbus_master.h"  // for public interface defines
-#include "mbc_serial_master.h"      // for create function of the port
-#include "esp_modbus_callbacks.h"   // for callback functions
+#include "esp_err.h"               // for esp_err_t
+#include "mbc_master.h"            // for master interface define
+#include "esp_modbus_master.h"     // for public interface defines
+#include "mbc_serial_master.h"     // for create function of the port
+#include "esp_modbus_callbacks.h"  // for callback functions
 
-// This file implements public API for Modbus master controller. 
+// This file implements public API for Modbus master controller.
 // These functions are wrappers for interface functions of the controller
 static mb_master_interface_t* master_interface_ptr = NULL;
 
 /**
  * Initialization of Modbus controller resources
  */
-esp_err_t mbc_master_init(mb_port_type_t port_type, void** handler)
-{
+esp_err_t mbc_master_init(mb_port_type_t port_type, void** handler) {
     void* port_handler = NULL;
     esp_err_t error = ESP_ERR_NOT_SUPPORTED;
-    switch(port_type)
-    {
-    case MB_PORT_SERIAL_MASTER:
-        error = mbc_serial_master_create(port_type, &port_handler);
-        break;
-    case MB_PORT_TCP_MASTER:
-        // TCP MAster is not yet supported
-        //error = mbc_tcp_master_create(port_type, &port_handler);
-        return ESP_ERR_NOT_SUPPORTED;
-    default:
-        return ESP_ERR_NOT_SUPPORTED;
+    switch (port_type) {
+        case MB_PORT_SERIAL_MASTER:
+            error = mbc_serial_master_create(port_type, &port_handler);
+            break;
+        case MB_PORT_TCP_MASTER:
+            // TCP MAster is not yet supported
+            //error = mbc_tcp_master_create(port_type, &port_handler);
+            return ESP_ERR_NOT_SUPPORTED;
+        default:
+            return ESP_ERR_NOT_SUPPORTED;
     }
     MB_MASTER_CHECK((port_handler != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -48,18 +46,17 @@ esp_err_t mbc_master_init(mb_port_type_t port_type, void** handler)
                     (uint16_t)error, (uint16_t)port_type);
 
     if ((port_handler != NULL) && (error == ESP_OK)) {
-        master_interface_ptr = (mb_master_interface_t*) port_handler;
+        master_interface_ptr = (mb_master_interface_t*)port_handler;
         *handler = port_handler;
     }
-    
-    return  error;
+
+    return error;
 }
 
 /**
  * Modbus controller destroy function
  */
-esp_err_t mbc_master_destroy()
-{
+esp_err_t mbc_master_destroy() {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -68,15 +65,14 @@ esp_err_t mbc_master_destroy()
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->destroy();
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master destroy failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master destroy failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
 
-esp_err_t mbc_master_get_cid_info(uint16_t cid, const mb_parameter_descriptor_t** param_info)
-{
+esp_err_t mbc_master_get_cid_info(uint16_t cid, const mb_parameter_descriptor_t** param_info) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -85,9 +81,9 @@ esp_err_t mbc_master_get_cid_info(uint16_t cid, const mb_parameter_descriptor_t*
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->get_cid_info(cid, param_info);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master get cid info failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master get cid info failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -95,8 +91,7 @@ esp_err_t mbc_master_get_cid_info(uint16_t cid, const mb_parameter_descriptor_t*
 /**
  * Get parameter data for corresponding characteristic
  */
-esp_err_t mbc_master_get_parameter(uint16_t cid, char* name, uint8_t* value, uint8_t* type)
-{
+esp_err_t mbc_master_get_parameter(uint16_t cid, char* name, uint8_t* value, uint8_t* type) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -105,9 +100,9 @@ esp_err_t mbc_master_get_parameter(uint16_t cid, char* name, uint8_t* value, uin
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->get_parameter(cid, name, value, type);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master get parameter failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master get parameter failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -115,8 +110,7 @@ esp_err_t mbc_master_get_parameter(uint16_t cid, char* name, uint8_t* value, uin
 /**
  * Send custom Modbus request defined as mb_param_request_t structure
  */
-esp_err_t mbc_master_send_request(mb_param_request_t* request, void* data_ptr)
-{
+esp_err_t mbc_master_send_request(mb_param_request_t* request, void* data_ptr) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -125,9 +119,9 @@ esp_err_t mbc_master_send_request(mb_param_request_t* request, void* data_ptr)
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->send_request(request, data_ptr);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master get parameter failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master get parameter failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -135,8 +129,7 @@ esp_err_t mbc_master_send_request(mb_param_request_t* request, void* data_ptr)
 /**
  * Set Modbus parameter description table
  */
-esp_err_t mbc_master_set_descriptor(const mb_parameter_descriptor_t* descriptor, const uint16_t num_elements)
-{
+esp_err_t mbc_master_set_descriptor(const mb_parameter_descriptor_t* descriptor, const uint16_t num_elements) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -145,9 +138,9 @@ esp_err_t mbc_master_set_descriptor(const mb_parameter_descriptor_t* descriptor,
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->set_descriptor(descriptor, num_elements);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master set descriptor failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master set descriptor failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -155,8 +148,7 @@ esp_err_t mbc_master_set_descriptor(const mb_parameter_descriptor_t* descriptor,
 /**
  * Set parameter value for characteristic selected by name and cid
  */
-esp_err_t mbc_master_set_parameter(uint16_t cid, char* name, uint8_t* value, uint8_t* type)
-{
+esp_err_t mbc_master_set_parameter(uint16_t cid, char* name, uint8_t* value, uint8_t* type) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -165,9 +157,9 @@ esp_err_t mbc_master_set_parameter(uint16_t cid, char* name, uint8_t* value, uin
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->set_parameter(cid, name, value, type);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master set parameter failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master set parameter failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -175,8 +167,7 @@ esp_err_t mbc_master_set_parameter(uint16_t cid, char* name, uint8_t* value, uin
 /**
  * Setup Modbus controller parameters
  */
-esp_err_t mbc_master_setup(void* comm_info)
-{
+esp_err_t mbc_master_setup(void* comm_info) {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -185,9 +176,9 @@ esp_err_t mbc_master_setup(void* comm_info)
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->setup(comm_info);
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master setup failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master setup failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
@@ -195,8 +186,7 @@ esp_err_t mbc_master_setup(void* comm_info)
 /**
  * Modbus controller stack start function
  */
-esp_err_t mbc_master_start()
-{
+esp_err_t mbc_master_start() {
     esp_err_t error = ESP_OK;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -205,16 +195,15 @@ esp_err_t mbc_master_start()
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->start();
-    MB_MASTER_CHECK((error == ESP_OK), 
-                    ESP_ERR_INVALID_STATE, 
-                    "SERIAL master start failure error=(0x%x).", 
+    MB_MASTER_CHECK((error == ESP_OK),
+                    ESP_ERR_INVALID_STATE,
+                    "SERIAL master start failure error=(0x%x).",
                     (uint16_t)error);
     return error;
 }
 
-eMBErrorCode eMBMasterRegDiscreteCB(UCHAR * pucRegBuffer, USHORT usAddress,
-                            USHORT usNDiscrete)
-{
+eMBErrorCode eMBMasterRegDiscreteCB(UCHAR* pucRegBuffer, USHORT usAddress,
+                                    USHORT usNDiscrete) {
     eMBErrorCode error = MB_ENOERR;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -227,8 +216,7 @@ eMBErrorCode eMBMasterRegDiscreteCB(UCHAR * pucRegBuffer, USHORT usAddress,
 }
 
 eMBErrorCode eMBMasterRegCoilsCB(UCHAR* pucRegBuffer, USHORT usAddress,
-        USHORT usNCoils, eMBRegisterMode eMode)
-{
+                                 USHORT usNCoils, eMBRegisterMode eMode) {
     eMBErrorCode error = MB_ENOERR;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -237,13 +225,12 @@ eMBErrorCode eMBMasterRegCoilsCB(UCHAR* pucRegBuffer, USHORT usAddress,
                     ESP_ERR_INVALID_STATE,
                     "Master interface is not correctly initialized.");
     error = master_interface_ptr->master_reg_cb_coils(pucRegBuffer, usAddress,
-                                                        usNCoils, eMode);
+                                                      usNCoils, eMode);
     return error;
 }
 
-eMBErrorCode eMBMasterRegHoldingCB(UCHAR * pucRegBuffer, USHORT usAddress,
-        USHORT usNRegs, eMBRegisterMode eMode)
-{
+eMBErrorCode eMBMasterRegHoldingCB(UCHAR* pucRegBuffer, USHORT usAddress,
+                                   USHORT usNRegs, eMBRegisterMode eMode) {
     eMBErrorCode error = MB_ENOERR;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,
@@ -256,9 +243,8 @@ eMBErrorCode eMBMasterRegHoldingCB(UCHAR * pucRegBuffer, USHORT usAddress,
     return error;
 }
 
-eMBErrorCode eMBMasterRegInputCB(UCHAR * pucRegBuffer, USHORT usAddress,
-                                USHORT usNRegs)
-{
+eMBErrorCode eMBMasterRegInputCB(UCHAR* pucRegBuffer, USHORT usAddress,
+                                 USHORT usNRegs) {
     eMBErrorCode error = MB_ENOERR;
     MB_MASTER_CHECK((master_interface_ptr != NULL),
                     ESP_ERR_INVALID_STATE,

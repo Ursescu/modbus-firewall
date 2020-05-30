@@ -28,21 +28,21 @@
  * @brief Parameter access event information type
  */
 typedef struct {
-    uint32_t time_stamp;                    /*!< Timestamp of Modbus Event (uS)*/
-    uint16_t mb_offset;                     /*!< Modbus register offset */
-    mb_event_group_t type;                  /*!< Modbus event type */
-    uint8_t* address;                       /*!< Modbus data storage address */
-    size_t size;                            /*!< Modbus event register size (number of registers)*/
+    uint32_t time_stamp;   /*!< Timestamp of Modbus Event (uS)*/
+    uint16_t mb_offset;    /*!< Modbus register offset */
+    mb_event_group_t type; /*!< Modbus event type */
+    uint8_t* address;      /*!< Modbus data storage address */
+    size_t size;           /*!< Modbus event register size (number of registers)*/
 } mb_param_info_t;
 
 /**
  * @brief Parameter storage area descriptor
  */
 typedef struct {
-    uint16_t start_offset;                  /*!< Modbus start address for area descriptor */
-    mb_param_type_t type;                   /*!< Type of storage area descriptor */
-    void* address;                          /*!< Instance address for storage area descriptor */
-    size_t size;                            /*!< Instance size for area descriptor (bytes) */
+    uint16_t start_offset; /*!< Modbus start address for area descriptor */
+    mb_param_type_t type;  /*!< Type of storage area descriptor */
+    void* address;         /*!< Instance address for storage area descriptor */
+    size_t size;           /*!< Instance size for area descriptor (bytes) */
 } mb_register_area_descriptor_t;
 
 /**

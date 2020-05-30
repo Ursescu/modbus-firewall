@@ -43,44 +43,44 @@
  */
 #include "port.h"
 #include "driver/uart.h"
-#include "freertos/queue.h" // for queue support
+#include "freertos/queue.h"  // for queue support
 #include "soc/uart_periph.h"
 #include "driver/gpio.h"
-#include "esp_log.h"        // for esp_log
-#include "esp_err.h"        // for ESP_ERROR_CHECK macro
+#include "esp_log.h"  // for esp_log
+#include "esp_err.h"  // for ESP_ERROR_CHECK macro
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb_f.h"
 #include "mbport.h"
-#include "sdkconfig.h"              // for KConfig options
+#include "sdkconfig.h"  // for KConfig options
 #include "port_serial_firewall.h"
 
 // Definitions of UART default pin numbers
-#define MB_UART_INPUT_RXD   (CONFIG_MB_FIREWALL_UART_INPUT_RXD)
-#define MB_UART_INPUT_TXD   (CONFIG_MB_FIREWALL_UART_INPUT_TXD)
-#define MB_UART_INPUT_RTS   (CONFIG_MB_FIREWALL_UART_INPUT_RTS)
+#define MB_UART_INPUT_RXD (CONFIG_MB_FIREWALL_UART_INPUT_RXD)
+#define MB_UART_INPUT_TXD (CONFIG_MB_FIREWALL_UART_INPUT_TXD)
+#define MB_UART_INPUT_RTS (CONFIG_MB_FIREWALL_UART_INPUT_RTS)
 
-#define MB_UART_OUTPUT_RXD   (CONFIG_MB_FIREWALL_UART_OUTPUT_RXD)
-#define MB_UART_OUTPUT_TXD   (CONFIG_MB_FIREWALL_UART_OUTPUT_TXD)
-#define MB_UART_OUTPUT_RTS   (CONFIG_MB_FIREWALL_UART_OUTPUT_RTS)
+#define MB_UART_OUTPUT_RXD (CONFIG_MB_FIREWALL_UART_OUTPUT_RXD)
+#define MB_UART_OUTPUT_TXD (CONFIG_MB_FIREWALL_UART_OUTPUT_TXD)
+#define MB_UART_OUTPUT_RTS (CONFIG_MB_FIREWALL_UART_OUTPUT_RTS)
 
-#define MB_BAUD_RATE_DEFAULT        (115200)
-#define MB_QUEUE_LENGTH             (CONFIG_FMB_QUEUE_LENGTH)
+#define MB_BAUD_RATE_DEFAULT (115200)
+#define MB_QUEUE_LENGTH      (CONFIG_FMB_QUEUE_LENGTH)
 
-#define MB_SERIAL_TASK_PRIO         (CONFIG_FMB_SERIAL_TASK_PRIO)
-#define MB_SERIAL_TASK_STACK_SIZE   (CONFIG_FMB_SERIAL_TASK_STACK_SIZE)
-#define MB_SERIAL_TOUT              (3) // 3.5*8 = 28 ticks, TOUT=3 -> ~24..33 ticks
+#define MB_SERIAL_TASK_PRIO       (CONFIG_FMB_SERIAL_TASK_PRIO)
+#define MB_SERIAL_TASK_STACK_SIZE (CONFIG_FMB_SERIAL_TASK_STACK_SIZE)
+#define MB_SERIAL_TOUT            (3)  // 3.5*8 = 28 ticks, TOUT=3 -> ~24..33 ticks
 
 // Set buffer size for transmission
-#define MB_SERIAL_BUF_SIZE          (CONFIG_FMB_SERIAL_BUF_SIZE)
+#define MB_SERIAL_BUF_SIZE (CONFIG_FMB_SERIAL_BUF_SIZE)
 
 // Note: This code uses mixed coding standard from legacy IDF code and used freemodbus stack
 
 // A queue to handle UART event.
 static QueueHandle_t xMbFirewallUartQueueInput;
 static QueueHandle_t xMbFirewallUartQueueOutput;
-static TaskHandle_t  xMbFirewallTaskHandleInput;
-static TaskHandle_t  xMbFirewallTaskHandleOutput;
+static TaskHandle_t xMbFirewallTaskHandleInput;
+static TaskHandle_t xMbFirewallTaskHandleOutput;
 
 static const CHAR *TAG = "MB_FIREWALL_SERIAL";
 
@@ -88,25 +88,24 @@ static const CHAR *TAG = "MB_FIREWALL_SERIAL";
 static UCHAR ucUartNumberInput = UART_NUM_MAX - 1;
 static UCHAR ucUartNumberOutput = UART_NUM_MAX - 2;
 
-static BOOL bRxStateEnabledInput = FALSE; // Receiver enabled flag
-static BOOL bTxStateEnabledInput = FALSE; // Transmitter enabled flag
+static BOOL bRxStateEnabledInput = FALSE;  // Receiver enabled flag
+static BOOL bTxStateEnabledInput = FALSE;  // Transmitter enabled flag
 
-static BOOL bRxStateEnabledOutput = FALSE; // Receiver enabled flag
-static BOOL bTxStateEnabledOutput = FALSE; // Transmitter enabled flag
+static BOOL bRxStateEnabledOutput = FALSE;  // Receiver enabled flag
+static BOOL bTxStateEnabledOutput = FALSE;  // Transmitter enabled flag
 
-static UCHAR ucBufferInput[MB_SERIAL_BUF_SIZE]; // Temporary buffer to transfer received data to modbus stack
-static UCHAR ucBufferOutput[MB_SERIAL_BUF_SIZE]; // Temporary buffer to transfer received data to modbus stack
-static USHORT uiRxBufferPosInput = 0;    // position in the receiver buffer
-static USHORT uiRxBufferPosOutput = 0;    // position in the receiver buffer
+static UCHAR ucBufferInput[MB_SERIAL_BUF_SIZE];   // Temporary buffer to transfer received data to modbus stack
+static UCHAR ucBufferOutput[MB_SERIAL_BUF_SIZE];  // Temporary buffer to transfer received data to modbus stack
+static USHORT uiRxBufferPosInput = 0;             // position in the receiver buffer
+static USHORT uiRxBufferPosOutput = 0;            // position in the receiver buffer
 
 void vMBFirewallInputPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput) {
     // This function can be called from xMBRTUTransmitFSM() of different task
     if (bRxEnableInput) {
-
         bRxStateEnabledInput = TRUE;
-        vTaskResume(xMbFirewallTaskHandleInput); // Resume receiver task INPUT
+        vTaskResume(xMbFirewallTaskHandleInput);  // Resume receiver task INPUT
     } else {
-        vTaskSuspend(xMbFirewallTaskHandleInput); // Block receiver task
+        vTaskSuspend(xMbFirewallTaskHandleInput);  // Block receiver task
         bRxStateEnabledInput = FALSE;
     }
     if (bTxEnableInput) {
@@ -116,16 +115,12 @@ void vMBFirewallInputPortSerialEnable(BOOL bRxEnableInput, BOOL bTxEnableInput) 
     }
 }
 
-
-void vMBFirewallOutputPortSerialEnable(BOOL bRxEnableOutput, BOOL bTxEnableOutput)
-{
+void vMBFirewallOutputPortSerialEnable(BOOL bRxEnableOutput, BOOL bTxEnableOutput) {
     if (bRxEnableOutput) {
-
         bRxStateEnabledOutput = TRUE;
-        vTaskResume(xMbFirewallTaskHandleOutput); // Resume receiver task OUTPUT
-    }
-    else {
-        vTaskSuspend(xMbFirewallTaskHandleOutput); // Block receiver task
+        vTaskResume(xMbFirewallTaskHandleOutput);  // Resume receiver task OUTPUT
+    } else {
+        vTaskSuspend(xMbFirewallTaskHandleOutput);  // Block receiver task
         bRxStateEnabledOutput = FALSE;
     }
 
@@ -136,21 +131,20 @@ void vMBFirewallOutputPortSerialEnable(BOOL bRxEnableOutput, BOOL bTxEnableOutpu
     }
 }
 
-static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize)
-{
+static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize) {
     USHORT usLength;
 
     if (bRxStateEnabledInput) {
         if (xEventSize > 0) {
-            xEventSize = (xEventSize > MB_SERIAL_BUF_SIZE) ?  MB_SERIAL_BUF_SIZE : xEventSize;
+            xEventSize = (xEventSize > MB_SERIAL_BUF_SIZE) ? MB_SERIAL_BUF_SIZE : xEventSize;
             uiRxBufferPosInput = ((uiRxBufferPosInput + xEventSize) >= MB_SERIAL_BUF_SIZE) ? 0 : uiRxBufferPosInput;
             // Get received packet into Rx buffer
             usLength = uart_read_bytes(ucUartNumberInput, &ucBufferInput[uiRxBufferPosInput], xEventSize, portMAX_DELAY);
-            
+
             /* MB frame callback logic need to be reimplemented */
-            for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
+            for (USHORT usCnt = 0; usCnt < usLength; usCnt++) {
                 // Call the Modbus stack callback function and let it fill the buffers.
-                ( void )pxMBFirewallInputFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
+                (void)pxMBFirewallInputFrameCBByteReceived();  // calls callback xMBRTUReceiveFSM() to execute MB state machine
             }
 
             // The buffer is transferred into Modbus stack and is not needed here any more
@@ -159,28 +153,27 @@ static void vMBFirewallInputPortSerialRxPoll(size_t xEventSize)
             // Send event EV_FRAME_RECEIVED to allow stack process packet
 #ifndef MB_TIMER_PORT_ENABLED
             // Let the stack know that T3.5 time is expired and data is received
-            (void)pxMBFirewallInputPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
+            (void)pxMBFirewallInputPortCBTimerExpired();  // calls callback xMBRTUTimerT35Expired();
 #endif
             ESP_LOGD(TAG, "INPUT_RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
         }
     }
 }
 
-static void vMBFirewallOutputPortSerialRxPoll(size_t xEventSize)
-{
+static void vMBFirewallOutputPortSerialRxPoll(size_t xEventSize) {
     USHORT usLength;
 
     if (bRxStateEnabledOutput) {
         if (xEventSize > 0) {
-            xEventSize = (xEventSize > MB_SERIAL_BUF_SIZE) ?  MB_SERIAL_BUF_SIZE : xEventSize;
+            xEventSize = (xEventSize > MB_SERIAL_BUF_SIZE) ? MB_SERIAL_BUF_SIZE : xEventSize;
             uiRxBufferPosOutput = ((uiRxBufferPosOutput + xEventSize) >= MB_SERIAL_BUF_SIZE) ? 0 : uiRxBufferPosOutput;
             // Get received packet into Rx buffer
             usLength = uart_read_bytes(ucUartNumberOutput, &ucBufferOutput[uiRxBufferPosOutput], xEventSize, portMAX_DELAY);
-            
+
             /* MB frame callback logic need to be reimplemented */
-            for(USHORT usCnt = 0; usCnt < usLength; usCnt++ ) {
+            for (USHORT usCnt = 0; usCnt < usLength; usCnt++) {
                 // Call the Modbus stack callback function and let it fill the buffers.
-                ( void )pxMBFirewallOutputFrameCBByteReceived(); // calls callback xMBRTUReceiveFSM() to execute MB state machine
+                (void)pxMBFirewallOutputFrameCBByteReceived();  // calls callback xMBRTUReceiveFSM() to execute MB state machine
             }
 
             // The buffer is transferred into Modbus stack and is not needed here any more
@@ -189,25 +182,24 @@ static void vMBFirewallOutputPortSerialRxPoll(size_t xEventSize)
             // Send event EV_FRAME_RECEIVED to allow stack process packet
 #ifndef MB_TIMER_PORT_ENABLED
             // Let the stack know that T3.5 time is expired and data is received
-            (void)pxMBFirewallOutputPortCBTimerExpired(); // calls callback xMBRTUTimerT35Expired();
+            (void)pxMBFirewallOutputPortCBTimerExpired();  // calls callback xMBRTUTimerT35Expired();
 #endif
             ESP_LOGD(TAG, "OUTPUT_RX_T35_timeout: %d(bytes in buffer)\n", (uint32_t)usLength);
         }
     }
 }
 
-BOOL xMBFirewallInputPortSerialTxPoll()
-{
+BOOL xMBFirewallInputPortSerialTxPoll() {
     BOOL bStatus = FALSE;
     USHORT usCount = 0;
     BOOL bNeedPoll = FALSE;
 
-    if( bTxStateEnabledInput ) {
+    if (bTxStateEnabledInput) {
         // Continue while all response bytes put in buffer or out of buffer
         // TODO - rewrite logic here
-        while((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
+        while ((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
-            bNeedPoll = pxMBFirewallInputFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
+            bNeedPoll = pxMBFirewallInputFrameCBTransmitterEmpty();  // calls callback xMBRTUTransmitFSM();
         }
         ESP_LOGD(TAG, "INPUT_MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;
@@ -215,18 +207,17 @@ BOOL xMBFirewallInputPortSerialTxPoll()
     return bStatus;
 }
 
-BOOL xMBFirewallOutputPortSerialTxPoll()
-{
+BOOL xMBFirewallOutputPortSerialTxPoll() {
     BOOL bStatus = FALSE;
     USHORT usCount = 0;
     BOOL bNeedPoll = FALSE;
 
-    if( bTxStateEnabledOutput ) {
+    if (bTxStateEnabledOutput) {
         // Continue while all response bytes put in buffer or out of buffer
         // TODO - rewrite logic here
-        while((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
+        while ((bNeedPoll == FALSE) && (usCount++ < MB_SERIAL_BUF_SIZE)) {
             // Calls the modbus stack callback function to let it fill the UART transmit buffer.
-            bNeedPoll = pxMBFirewallOutputFrameCBTransmitterEmpty( ); // calls callback xMBRTUTransmitFSM();
+            bNeedPoll = pxMBFirewallOutputFrameCBTransmitterEmpty();  // calls callback xMBRTUTransmitFSM();
         }
         ESP_LOGD(TAG, "OUTPUT_MB_TX_buffer sent: (%d) bytes\n", (uint16_t)usCount);
         bStatus = TRUE;
@@ -235,17 +226,16 @@ BOOL xMBFirewallOutputPortSerialTxPoll()
 }
 
 /* Input uart task */
-static void vUartTaskInput(void *pvParameters)
-{
+static void vUartTaskInput(void *pvParameters) {
     uart_event_t xEvent;
-    for(;;) {
-        if (xQueueReceive(xMbFirewallUartQueueInput, (void*)&xEvent, portMAX_DELAY) == pdTRUE) {
+    for (;;) {
+        if (xQueueReceive(xMbFirewallUartQueueInput, (void *)&xEvent, portMAX_DELAY) == pdTRUE) {
             ESP_LOGD(TAG, "INPUT_MB_uart[%d] event:", ucUartNumberInput);
             //vMBPortTimersEnable();
-            switch(xEvent.type) {
+            switch (xEvent.type) {
                 //Event of UART receving data
                 case UART_DATA:
-                    ESP_LOGD(TAG,"INPUT Receive data, len: %d", xEvent.size);
+                    ESP_LOGD(TAG, "INPUT Receive data, len: %d", xEvent.size);
                     // Read received data and send it to modbus stack
                     vMBFirewallInputPortSerialRxPoll(xEvent.size);
                     break;
@@ -282,17 +272,16 @@ static void vUartTaskInput(void *pvParameters)
 }
 
 /* Output uart task */
-static void vUartTaskOutput(void *pvParameters)
-{
+static void vUartTaskOutput(void *pvParameters) {
     uart_event_t xEvent;
-    for(;;) {
-        if (xQueueReceive(xMbFirewallUartQueueOutput, (void*)&xEvent, portMAX_DELAY) == pdTRUE) {
+    for (;;) {
+        if (xQueueReceive(xMbFirewallUartQueueOutput, (void *)&xEvent, portMAX_DELAY) == pdTRUE) {
             ESP_LOGD(TAG, "OUTPUT_MB_uart[%d] event:", ucUartNumberOutput);
             //vMBPortTimersEnable();
-            switch(xEvent.type) {
+            switch (xEvent.type) {
                 //Event of UART receving data
                 case UART_DATA:
-                    ESP_LOGD(TAG,"OUTPUT Receive data, len: %d", xEvent.size);
+                    ESP_LOGD(TAG, "OUTPUT Receive data, len: %d", xEvent.size);
                     // Read received data and send it to modbus stack
                     vMBFirewallOutputPortSerialRxPoll(xEvent.size);
                     break;
@@ -328,19 +317,17 @@ static void vUartTaskOutput(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-
 BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
-                        UCHAR ucDataBitsInput, eMBParity eParityInput,
-                        UCHAR ucPORTOutput, ULONG ulBaudRateOutput,
-                        UCHAR ucDataBitsOutput, eMBParity eParityOutput)
-{
+                               UCHAR ucDataBitsInput, eMBParity eParityInput,
+                               UCHAR ucPORTOutput, ULONG ulBaudRateOutput,
+                               UCHAR ucDataBitsOutput, eMBParity eParityOutput) {
     esp_err_t xErr = ESP_OK;
     MB_PORT_CHECK((eParityInput <= MB_PAR_EVEN), FALSE, "mb serial set parity for input failed.");
     MB_PORT_CHECK((eParityOutput <= MB_PAR_EVEN), FALSE, "mb serial set parity for output failed.");
     // Set communication port number
     ucUartNumberInput = ucPORTInput;
     ucUartNumberOutput = ucPORTOutput;
- 
+
     // Configure serial communication parameters
     UCHAR ucParityInput = UART_PARITY_DISABLE;
     UCHAR ucDataInput = UART_DATA_8_BITS;
@@ -348,7 +335,7 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
     UCHAR ucParityOutput = UART_PARITY_DISABLE;
     UCHAR ucDataOutput = UART_DATA_8_BITS;
 
-    switch(eParityInput){
+    switch (eParityInput) {
         case MB_PAR_NONE:
             ucParityInput = UART_PARITY_DISABLE;
             break;
@@ -360,7 +347,7 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
             break;
     }
 
-    switch(eParityOutput){
+    switch (eParityOutput) {
         case MB_PAR_NONE:
             ucParityOutput = UART_PARITY_DISABLE;
             break;
@@ -372,7 +359,7 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
             break;
     }
 
-    switch(ucDataBitsInput){
+    switch (ucDataBitsInput) {
         case 5:
             ucDataInput = UART_DATA_5_BITS;
             break;
@@ -390,7 +377,7 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
             break;
     }
 
-    switch(ucDataBitsOutput){
+    switch (ucDataBitsOutput) {
         case 5:
             ucDataOutput = UART_DATA_5_BITS;
             break;
@@ -429,67 +416,66 @@ BOOL xMBFirewallPortSerialInit(UCHAR ucPORTInput, ULONG ulBaudRateInput,
     // Set UART config
     xErr = uart_param_config(ucUartNumberInput, &xUartConfigInput);
     MB_PORT_CHECK((xErr == ESP_OK),
-            FALSE, "mb input config failure, uart_param_config() returned (0x%x).", (uint32_t)xErr);
-    
+                  FALSE, "mb input config failure, uart_param_config() returned (0x%x).", (uint32_t)xErr);
+
     xErr = uart_param_config(ucUartNumberOutput, &xUartConfigOutput);
     MB_PORT_CHECK((xErr == ESP_OK),
-            FALSE, "mb output config failure, uart_param_config() returned (0x%x).", (uint32_t)xErr);
+                  FALSE, "mb output config failure, uart_param_config() returned (0x%x).", (uint32_t)xErr);
 
     // Install UART INPUT driver, and get the queue.
     xErr = uart_driver_install(ucUartNumberInput, MB_SERIAL_BUF_SIZE, MB_SERIAL_BUF_SIZE,
-            MB_QUEUE_LENGTH, &xMbFirewallUartQueueInput, 0);
+                               MB_QUEUE_LENGTH, &xMbFirewallUartQueueInput, 0);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
-            "mb input serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
+                  "mb input serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
 
     // Install UART OUTPUT driver, and get the queue.
     xErr = uart_driver_install(ucUartNumberOutput, MB_SERIAL_BUF_SIZE, MB_SERIAL_BUF_SIZE,
-            MB_QUEUE_LENGTH, &xMbFirewallUartQueueOutput, 0);
+                               MB_QUEUE_LENGTH, &xMbFirewallUartQueueOutput, 0);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
-            "mb output serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
+                  "mb output serial driver failure, uart_driver_install() returned (0x%x).", (uint32_t)xErr);
 
 #ifndef MB_TIMER_PORT_ENABLED
     // Set timeout for TOUT interrupt (T3.5 modbus time)
     xErr = uart_set_rx_timeout(ucUartNumberInput, MB_SERIAL_TOUT);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
-            "mb input serial set rx timeout failure, uart_set_rx_timeout() returned (0x%x).", (uint32_t)xErr);
+                  "mb input serial set rx timeout failure, uart_set_rx_timeout() returned (0x%x).", (uint32_t)xErr);
 
     xErr = uart_set_rx_timeout(ucUartNumberOutput, MB_SERIAL_TOUT);
     MB_PORT_CHECK((xErr == ESP_OK), FALSE,
-            "mb output serial set rx timeout failure, uart_set_rx_timeout() returned (0x%x).", (uint32_t)xErr);
+                  "mb output serial set rx timeout failure, uart_set_rx_timeout() returned (0x%x).", (uint32_t)xErr);
 #endif
 
     // Create a task to handle UART events for INPUT
     BaseType_t xStatus = xTaskCreate(vUartTaskInput, "uart_queue_task_input", MB_SERIAL_TASK_STACK_SIZE,
-                                        NULL, MB_SERIAL_TASK_PRIO, &xMbFirewallTaskHandleInput);
+                                     NULL, MB_SERIAL_TASK_PRIO, &xMbFirewallTaskHandleInput);
     if (xStatus != pdPASS) {
         vTaskDelete(xMbFirewallTaskHandleInput);
         // Force exit from function with failure
         MB_PORT_CHECK(FALSE, FALSE,
-                "mb input stack serial task creation error. xTaskCreate() returned (0x%x).",
-                (uint32_t)xStatus);
+                      "mb input stack serial task creation error. xTaskCreate() returned (0x%x).",
+                      (uint32_t)xStatus);
     } else {
-        vTaskSuspend(xMbFirewallTaskHandleInput); // Suspend serial task while stack is not started
+        vTaskSuspend(xMbFirewallTaskHandleInput);  // Suspend serial task while stack is not started
     }
 
     // Create a task to handle UART events for OUTPUT
     xStatus = xTaskCreate(vUartTaskOutput, "uart_queue_task_output", MB_SERIAL_TASK_STACK_SIZE,
-                                        NULL, MB_SERIAL_TASK_PRIO, &xMbFirewallTaskHandleOutput);
+                          NULL, MB_SERIAL_TASK_PRIO, &xMbFirewallTaskHandleOutput);
     if (xStatus != pdPASS) {
         vTaskDelete(xMbFirewallTaskHandleOutput);
         // Force exit from function with failure
         MB_PORT_CHECK(FALSE, FALSE,
-                "mb output stack serial task creation error. xTaskCreate() returned (0x%x).",
-                (uint32_t)xStatus);
+                      "mb output stack serial task creation error. xTaskCreate() returned (0x%x).",
+                      (uint32_t)xStatus);
     } else {
-        vTaskSuspend(xMbFirewallTaskHandleOutput); // Suspend serial task while stack is not started
+        vTaskSuspend(xMbFirewallTaskHandleOutput);  // Suspend serial task while stack is not started
     }
     uiRxBufferPosInput = 0;
     uiRxBufferPosOutput = 0;
     return TRUE;
 }
 
-void vMBFirewallPortSerialClose()
-{
+void vMBFirewallPortSerialClose() {
     (void)vTaskSuspend(xMbFirewallTaskHandleInput);
     (void)vTaskDelete(xMbFirewallTaskHandleInput);
 
@@ -500,16 +486,14 @@ void vMBFirewallPortSerialClose()
     ESP_ERROR_CHECK(uart_driver_delete(ucUartNumberOutput));
 }
 
-BOOL xMBFirewallInputPortSerialPutByte(CHAR ucByte)
-{
+BOOL xMBFirewallInputPortSerialPutByte(CHAR ucByte) {
     // Send one byte to UART transmission buffer
     // This function is called by Modbus stack
     UCHAR ucLength = uart_write_bytes(ucUartNumberInput, &ucByte, 1);
     return (ucLength == 1);
 }
 
-BOOL xMBFirewallOutputPortSerialPutByte(CHAR ucByte)
-{
+BOOL xMBFirewallOutputPortSerialPutByte(CHAR ucByte) {
     // Send one byte to UART transmission buffer
     // This function is called by Modbus stack
     UCHAR ucLength = uart_write_bytes(ucUartNumberOutput, &ucByte, 1);
@@ -517,24 +501,21 @@ BOOL xMBFirewallOutputPortSerialPutByte(CHAR ucByte)
 }
 
 // Get one byte from intermediate input RX buffer
-BOOL xMBFirewallInputPortSerialGetByte(CHAR* pucByte)
-{
+BOOL xMBFirewallInputPortSerialGetByte(CHAR *pucByte) {
     assert(pucByte != NULL);
     MB_PORT_CHECK((uiRxBufferPosInput < MB_SERIAL_BUF_SIZE),
-            FALSE, "mb stack serial get byte failure.");
+                  FALSE, "mb stack serial get byte failure.");
     *pucByte = ucBufferInput[uiRxBufferPosInput];
     uiRxBufferPosInput++;
     return TRUE;
 }
 
 // Get one byte from intermediate output RX buffer
-BOOL xMBFirewallOutputPortSerialGetByte(CHAR* pucByte)
-{
+BOOL xMBFirewallOutputPortSerialGetByte(CHAR *pucByte) {
     assert(pucByte != NULL);
     MB_PORT_CHECK((uiRxBufferPosOutput < MB_SERIAL_BUF_SIZE),
-            FALSE, "mb stack serial get byte failure.");
+                  FALSE, "mb stack serial get byte failure.");
     *pucByte = ucBufferOutput[uiRxBufferPosOutput];
     uiRxBufferPosOutput++;
     return TRUE;
 }
-

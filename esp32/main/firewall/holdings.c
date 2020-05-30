@@ -45,7 +45,7 @@ mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t le
         reg_addr++;
 
         return firewall_find_rule(&frame[MB_PDU_FUNC_WRITE_VALUE_OFF],
-                                           reg_addr, 1, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
+                                  reg_addr, 1, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
     } else {
         /* Can't be a valid request because the length is incorrect. */
         return MB_FIREWALL_FAIL;
@@ -77,9 +77,9 @@ mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t
             (reg_count <= MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX) &&
             (reg_byte_count == (uint8_t)(2 * reg_count))) {
             /* Make callback to update the register values. */
-            
+
             return firewall_find_rule(&frame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                                           reg_addr, reg_count, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
+                                      reg_addr, reg_count, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
 
         } else {
             return MB_FIREWALL_FAIL;
@@ -159,12 +159,12 @@ mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uin
             /* Make callback to update the register values. */
 
             found_read = firewall_find_rule(&frame[MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF],
-                                                    reg_addr_write, reg_count_write, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
+                                            reg_addr_write, reg_count_write, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
             if (found_read == MB_FIREWALL_FAIL) {
                 return MB_FIREWALL_FAIL;
             }
 
-            return firewall_find_rule(NULL, reg_addr_read, reg_count_read, MB_FIREWALL_REG_READ,  MB_FIREWALL_HOLDING);
+            return firewall_find_rule(NULL, reg_addr_read, reg_count_read, MB_FIREWALL_REG_READ, MB_FIREWALL_HOLDING);
 
         } else {
             return MB_FIREWALL_FAIL;

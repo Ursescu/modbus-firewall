@@ -10,21 +10,21 @@
 #include "esp_modbus_common.h"      // for common types
 
 /* Need two UART ports to use firewall feature */
-#define MB_UART_PORT_IN (UART_NUM_MAX - 1)   // Default UART port number
+#define MB_UART_PORT_IN  (UART_NUM_MAX - 1)  // Default UART port number
 #define MB_UART_PORT_OUT (UART_NUM_MAX - 2)  // Default UART port number
 
 /**
  * @brief Parameter access event information type
  */
 typedef struct {
-    uint32_t time_stamp;                    /*!< Timestamp of Modbus Event (uS)*/
-    uint16_t mb_offset;                     /*!< Modbus register offset */
-    mb_event_group_t type;                  /*!< Modbus event type */
-    uint8_t* address;                       /*!< Modbus data storage address */
-    size_t size;                            /*!< Modbus event register size (number of registers)*/
+    uint32_t time_stamp;   /*!< Timestamp of Modbus Event (uS)*/
+    uint16_t mb_offset;    /*!< Modbus register offset */
+    mb_event_group_t type; /*!< Modbus event type */
+    uint8_t* address;      /*!< Modbus data storage address */
+    size_t size;           /*!< Modbus event register size (number of registers)*/
 } mb_firewall_info_t;
 
-typedef char (*mb_firewall_rule_function_t)(unsigned char, unsigned char *, unsigned short );
+typedef char (*mb_firewall_rule_function_t)(unsigned char, unsigned char*, unsigned short);
 
 typedef struct {
     mb_mode_type_t mode_input;   /*!< Modbus communication mode */
@@ -37,7 +37,6 @@ typedef struct {
     uart_parity_t parity_output; /*!< Modbus UART parity settings OUTPUT */
     mb_firewall_rule_function_t packet_handler;
 } mb_firewall_comm_info_t;
-
 
 /**
  * @brief Initialize Modbus controller and stack

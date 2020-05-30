@@ -59,9 +59,7 @@ static UCHAR ucPortMode = 0;
 
 /* ----------------------- Start implementation -----------------------------*/
 
-BOOL
-bMBPortIsWithinException( void )
-{
+BOOL bMBPortIsWithinException(void) {
     BOOL bIsWithinException = xPortInIsrContext();
     return bIsWithinException;
 }
@@ -69,26 +67,21 @@ bMBPortIsWithinException( void )
 /* ----------------------- Start implementation -----------------------------*/
 
 UCHAR
-ucMBPortGetMode( void )
-{
+ucMBPortGetMode(void) {
     return ucPortMode;
 }
 
-void
-vMBPortSetMode( UCHAR ucMode )
-{
+void vMBPortSetMode(UCHAR ucMode) {
     ENTER_CRITICAL_SECTION();
     ucPortMode = ucMode;
     EXIT_CRITICAL_SECTION();
 }
 
-void
-vMBPortClose( void )
-{
-    extern void     vMBPortSerialClose( void );
-    extern void     vMBPortTimerClose( void );
-    extern void     vMBPortEventClose( void );
-    vMBPortSerialClose(  );
-    vMBPortTimerClose(  );
-    vMBPortEventClose(  );
+void vMBPortClose(void) {
+    extern void vMBPortSerialClose(void);
+    extern void vMBPortTimerClose(void);
+    extern void vMBPortEventClose(void);
+    vMBPortSerialClose();
+    vMBPortTimerClose();
+    vMBPortEventClose();
 }
