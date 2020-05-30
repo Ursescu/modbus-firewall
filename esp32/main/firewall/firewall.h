@@ -32,9 +32,17 @@
 #define MB_FIREWALL_NO_HANDLER -1
 
 typedef enum mb_firewall_reg_mode {
-    FIREWALL_REG_READ,
-    FIREWALL_REG_WRITE
+    MB_FIREWALL_REG_READ,
+    MB_FIREWALL_REG_WRITE
 } mb_firewall_reg_mode_t;
+
+/* Using this to determine in which rule table too lookup for */
+typedef enum mb_firewall_data_type {
+    MB_FIREWALL_COIL,
+    MB_FIREWALL_DISCRETE,
+    MB_FIREWALL_INPUT,
+    MB_FIREWALL_HOLDING
+} mb_firewall_data_type_t;
 
 /* Defines and typedefs for the firewall rule system */
 #define MB_FIREWALL_MAX_ADDRS 32
@@ -42,15 +50,15 @@ typedef enum mb_firewall_reg_mode {
 #define MB_FIREWALL_MAX_RULES 64
 
 typedef enum mb_firewall_policy {
-    FIREWALL_WHITELIST = 0,
-    FIREWALL_BLACKLIST
+    MB_FIREWALL_WHITELIST = 0,
+    MB_FIREWALL_BLACKLIST
 } mb_firewall_policy_t;
 
 typedef uint8_t mb_firewall_adress_t;
 
 typedef enum mb_firewall_stat {
-    FIREWALL_FAIL = 0,
-    FIREWALL_PASS
+    MB_FIREWALL_FAIL = 0,
+    MB_FIREWALL_PASS
 } mb_firewall_stat_t;
 
 typedef mb_firewall_stat_t (*mb_firewall_func_handler)(uint8_t *, uint16_t);
@@ -60,7 +68,67 @@ typedef struct mb_firewall_func {
     mb_firewall_func_handler handler;
 } mb_firewall_func_t;
 
+/* Typedefs for the firewall rules */
+
+/*  
+ *
+ *
+ */
+typedef enum mb_firewall_rule_type {
+    MB_FIREWALL_RULE_FIXED,
+    MB_FIREWALL_RULE_REG_INTERVAL,
+    MB_FIREWALL_RULE_REG_DATA_INTERVAL
+} mb_firewall_rule_type_t;
+
+/* Could've make a single rule type, the most generic one,
+ * but it is easier to distinguish them using union. There is no
+ * memory penality by doing this.
+ */
+
+/* Fixed rule data type */
+typedef struct mb_firewall_rule_fixed {
+    uint16_t reg_addr;
+    uint16_t reg_data;
+} mb_firewall_rule_fixed_t;
+
+/* Rule that allows range of registers and single value */
+typedef struct mb_firewall_rule_reg_interval {
+    uint16_t reg_addr_start;
+    uint16_t reg_addr_stop;
+    uint16_t reg_data;
+} mb_firewall_rule_reg_interval_t;
+
+/* Rule that allows range of both registers and values */
+typedef struct mb_firewall_rule_reg_data_interval {
+    uint16_t reg_addr_start;
+    uint16_t reg_addr_stop;
+    uint16_t reg_data_start;
+    uint16_t reg_data_stop;
+} mb_firewall_rule_reg_data_interval_t;
+
+/* Generic rule data type */
 typedef struct mb_firewall_rule {
+    /* Type of rule */
+    mb_firewall_rule_type_t type;
+
+    /* Policy whitelist/blacklist */
+    mb_firewall_policy_t policy;
+
+    /* Read or write */
+    mb_firewall_reg_mode_t mode;
+
+    /* Rule union type, can be one of the tree firewall rule type */
+    union {
+        /* Fixed type */
+        mb_firewall_rule_fixed_t rule_fixed;
+
+        /* Reg interval */
+        mb_firewall_rule_reg_interval_t rule_reg_interval;
+
+        /* Reg data interval */
+        mb_firewall_rule_reg_data_interval_t rule_reg_data_interval;
+    };
+
 } mb_firewall_rule_t;
 
 typedef enum firewall_match {
@@ -90,5 +158,8 @@ mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t le
 mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t len);
 
 mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uint16_t len);
+
+/* Find and apply rule function */
+mb_firewall_stat_t firewall_find_rule(uint8_t *, uint16_t, uint16_t, mb_firewall_reg_mode_t, mb_firewall_data_type_t);
 
 #endif

@@ -32,15 +32,6 @@
 
 static const char *TAG = "MB_FIREWALL_HOLDINGS";
 
-extern mb_firewall_policy_t firewall_type;
-
-/* Searching through the generated rules for the holdings */
-static firewall_match_t firewall_find_holding_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t holding_count, mb_firewall_reg_mode_t mode) {
-    ESP_LOGI(TAG, "find holding rule: reg 0x%04X, count %hu, mode %s", reg_addr, holding_count, mode == FIREWALL_REG_READ ? "R" : "W");
-
-    return FIREWALL_RULE_NOT_FOUND;
-}
-
 mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t len) {
     ESP_LOGI(TAG, "write single holding register handler");
 
@@ -53,25 +44,14 @@ mb_firewall_stat_t mb_firewall_write_single_register(uint8_t *frame, uint16_t le
         reg_addr |= (uint16_t)(frame[MB_PDU_FUNC_WRITE_ADDR_OFF + 1]);
         reg_addr++;
 
-        found = firewall_find_holding_rule(&frame[MB_PDU_FUNC_WRITE_VALUE_OFF],
-                                           reg_addr, 1, FIREWALL_REG_WRITE);
+        return firewall_find_rule(&frame[MB_PDU_FUNC_WRITE_VALUE_OFF],
+                                           reg_addr, 1, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
     } else {
         /* Can't be a valid request because the length is incorrect. */
-        return FIREWALL_FAIL;
-    }
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
+        return MB_FIREWALL_FAIL;
     }
 
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }
 
 mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t len) {
@@ -97,31 +77,19 @@ mb_firewall_stat_t mb_firewall_write_multiple_registers(uint8_t *frame, uint16_t
             (reg_count <= MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX) &&
             (reg_byte_count == (uint8_t)(2 * reg_count))) {
             /* Make callback to update the register values. */
-            found =
-                firewall_find_holding_rule(&frame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                                           reg_addr, reg_count, FIREWALL_REG_WRITE);
+            
+            return firewall_find_rule(&frame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
+                                           reg_addr, reg_count, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
 
         } else {
-            return FIREWALL_FAIL;
+            return MB_FIREWALL_FAIL;
         }
     } else {
         /* Can't be a valid request because the length is incorrect. */
-        return FIREWALL_FAIL;
+        return MB_FIREWALL_FAIL;
     }
 
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }
 
 mb_firewall_stat_t mb_firewall_read_registers(uint8_t *frame, uint16_t len) {
@@ -144,36 +112,23 @@ mb_firewall_stat_t mb_firewall_read_registers(uint8_t *frame, uint16_t len) {
          * return Modbus illegal data value exception. 
          */
         if ((reg_count >= 1) && (reg_count <= MB_PDU_FUNC_READ_REGCNT_MAX)) {
-            found = firewall_find_holding_rule(NULL, reg_addr, reg_count, FIREWALL_REG_READ);
+            return firewall_find_rule(NULL, reg_addr, reg_count, MB_FIREWALL_REG_READ, MB_FIREWALL_HOLDING);
 
         } else {
-            return FIREWALL_FAIL;
+            return MB_FIREWALL_FAIL;
         }
     } else {
         /* Can't be a valid request because the length is incorrect. */
-        return FIREWALL_FAIL;
+        return MB_FIREWALL_FAIL;
     }
 
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }
 
 mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uint16_t len) {
     ESP_LOGI(TAG, "read write mutiple holding registers handler");
 
-    firewall_match_t found_read = FIREWALL_RULE_NOT_FOUND;
-    firewall_match_t found_write = FIREWALL_RULE_NOT_FOUND;
+    mb_firewall_stat_t found_read;
 
     uint16_t reg_addr_read;
     uint16_t reg_count_read;
@@ -203,27 +158,18 @@ mb_firewall_stat_t mb_firewall_read_write_multiple_registers(uint8_t *frame, uin
             ((2 * reg_count_write) == reg_byte_count_write)) {
             /* Make callback to update the register values. */
 
-            found_read = firewall_find_holding_rule(&frame[MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF],
-                                                    reg_addr_write, reg_count_write, FIREWALL_REG_WRITE);
+            found_read = firewall_find_rule(&frame[MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF],
+                                                    reg_addr_write, reg_count_write, MB_FIREWALL_REG_WRITE, MB_FIREWALL_HOLDING);
+            if (found_read == MB_FIREWALL_FAIL) {
+                return MB_FIREWALL_FAIL;
+            }
 
-            found_write = firewall_find_holding_rule(NULL, reg_addr_read, reg_count_read, FIREWALL_REG_READ);
+            return firewall_find_rule(NULL, reg_addr_read, reg_count_read, MB_FIREWALL_REG_READ,  MB_FIREWALL_HOLDING);
 
         } else {
-            return FIREWALL_FAIL;
+            return MB_FIREWALL_FAIL;
         }
     }
 
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return (((found_read ^ found_write) == FIREWALL_RULE_FOUND) && (found_read == FIREWALL_RULE_FOUND)) ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return (((found_read ^ found_write) == FIREWALL_RULE_FOUND) && (found_read == FIREWALL_RULE_FOUND)) ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }

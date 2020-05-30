@@ -16,15 +16,6 @@
 
 static const char *TAG = "MB_FIREWALL_INPUTS";
 
-extern mb_firewall_policy_t firewall_default_policy;
-
-/* Searching through the generated rules for the inputs */
-static firewall_match_t firewall_find_input_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t input_count) {
-    ESP_LOGI(TAG, "find input rule: reg 0x%04X, count %hu", reg_addr, input_count);
-
-    return FIREWALL_RULE_NOT_FOUND;
-}
-
 mb_firewall_stat_t mb_firewall_read_input_registers(uint8_t *frame, uint16_t len) {
     ESP_LOGI(TAG, "read input register handler");
 
@@ -45,29 +36,16 @@ mb_firewall_stat_t mb_firewall_read_input_registers(uint8_t *frame, uint16_t len
          */
         if ((reg_count >= 1) && (reg_count < MB_PDU_FUNC_READ_REGCNT_MAX)) {
             /* Set the current PDU data pointer to the beginning. */
+            return firewall_find_rule(NULL, reg_addr, reg_count, MB_FIREWALL_REG_READ, MB_FIREWALL_INPUT);
 
-            found =
-                firewall_find_input_rule(NULL, reg_addr, reg_count);
         } else {
-            return FIREWALL_FAIL;
+            return MB_FIREWALL_FAIL;
         }
     } else {
         /* Can't be a valid read input register request because the length
          * is incorrect. */
-        return FIREWALL_FAIL;
+        return MB_FIREWALL_FAIL;
     }
 
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }

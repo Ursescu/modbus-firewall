@@ -14,15 +14,6 @@
 
 static const char *TAG = "MB_FIREWALL_DISCRETE";
 
-extern mb_firewall_policy_t firewall_default_policy;
-
-/* Searching through the generated rules for the discrets */
-static firewall_match_t firewall_find_discret_rule(uint8_t *reg_buffer, uint16_t reg_addr, uint16_t discrete_count) {
-    ESP_LOGI(TAG, "find discret rule: reg 0x%04X, count %hu", reg_addr, discrete_count);
-
-    return FIREWALL_RULE_NOT_FOUND;
-}
-
 mb_firewall_stat_t mb_firewall_read_discrete_inputs(uint8_t *frame, uint16_t len) {
     ESP_LOGI(TAG, "read discrete inputs handler");
 
@@ -44,29 +35,16 @@ mb_firewall_stat_t mb_firewall_read_discrete_inputs(uint8_t *frame, uint16_t len
          */
         if ((discrete_count >= 1) &&
             (discrete_count < MB_PDU_FUNC_READ_DISCCNT_MAX)) {
-            found =
-                firewall_find_discret_rule(NULL, reg_addr, discrete_count);
+            return firewall_find_rule(NULL, reg_addr, discrete_count, MB_FIREWALL_REG_READ, MB_FIREWALL_DISCRETE);
 
         } else {
-            return FIREWALL_FAIL;
+            return MB_FIREWALL_FAIL;
         }
     } else {
         /* Can't be a valid read coil register request because the length
          * is incorrect. */
-        return FIREWALL_FAIL;
+        return MB_FIREWALL_FAIL;
     }
 
-    switch (firewall_type) {
-        case FIREWALL_BLACKLIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_FAIL : FIREWALL_PASS;
-            break;
-        case FIREWALL_WHITELIST:
-            return found == FIREWALL_RULE_FOUND ? FIREWALL_PASS : FIREWALL_FAIL;
-            break;
-        default:
-            ESP_LOGE(TAG, "uknown value for the firewall type %hhu", (uint8_t)firewall_type);
-            return FIREWALL_FAIL;
-    }
-
-    return FIREWALL_FAIL;
+    return MB_FIREWALL_FAIL;
 }
