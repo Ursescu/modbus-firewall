@@ -85,7 +85,7 @@ typedef enum mb_firewall_rule_type {
  * memory penality by doing this.
  */
 
-/* Fixed rule data type */
+/* Rule that allows single register and single value */
 typedef struct mb_firewall_rule_fixed {
     uint16_t reg_addr;
     uint16_t reg_data;
@@ -108,10 +108,10 @@ typedef struct mb_firewall_rule_reg_data_interval {
 
 /* Generic rule data type */
 typedef struct mb_firewall_rule {
-    /* Type of rule */
+    /* Rule type */
     mb_firewall_rule_type_t type;
 
-    /* Policy whitelist/blacklist */
+    /* Whitelist or blacklist */
     mb_firewall_policy_t policy;
 
     /* Read or write */
