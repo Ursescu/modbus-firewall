@@ -44,7 +44,7 @@ typedef enum mb_firewall_mode {
     FIREWALL_BLACKLIST
 } mb_firewall_mode_t;
 
-typedef uint8_t mb_firewall_adress;
+typedef uint8_t mb_firewall_adress_t;
 
 typedef enum mb_firewall_stat {
     FIREWALL_FAIL = 0,

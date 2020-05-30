@@ -3,12 +3,12 @@
 #include "firewall.h"
 
 extern mb_firewall_mode_t firewall_type;
-extern mb_firewall_adress firewall_addresses[MB_FIREWALL_MAX_ADDRS];
+extern mb_firewall_adress_t firewall_addresses[MB_FIREWALL_MAX_ADDRS];
 
 mb_firewall_mode_t firewall_type = FIREWALL_BLACKLIST;
 
-mb_firewall_adress firewall_addresses[MB_FIREWALL_MAX_ADDRS] = {
-    10, 1, 4, 5, 14
+mb_firewall_adress_t firewall_addresses[MB_FIREWALL_MAX_ADDRS] = {
+    10, 15
 };
 
 
