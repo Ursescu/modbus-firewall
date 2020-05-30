@@ -103,7 +103,7 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
     for (reg_idx = 0; reg_idx < coil_count; reg_idx++) {
         mb_firewall_policy_t rule_policy;
         firewall_match_t match = FIREWALL_RULE_NOT_FOUND;
-        uint8_t data = 0;
+        uint16_t data = 0;
 
         if (mode == MB_FIREWALL_REG_WRITE) {
             switch (data_type) {
@@ -114,7 +114,7 @@ mb_firewall_stat_t firewall_find_rule(uint8_t *reg_buffer, uint16_t reg_addr, ui
                     data = !!data;
                     break;
                 case MB_FIREWALL_HOLDING:
-                    data = reg_buffer[reg_idx];
+                    data = reg_buffer[reg_idx * 2] << 8 | reg_buffer[reg_idx * 2 + 1];
                     break;
                 default:
                     /* Nothing here */
