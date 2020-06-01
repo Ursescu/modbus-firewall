@@ -1,8 +1,10 @@
 /* ----------------------- AVR includes -------------------------------------*/
 #include "avr/io.h"
 #include "avr/interrupt.h"
-#define F_CPU 16000000
 #include "avr/delay.h"
+
+#include "mbfirewall.h"
+
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb_f.h"
 #include "mbport.h"
@@ -35,7 +37,7 @@ main( void )
 {
     eMBErrorCode    eStatus;
 
-    eStatus = eMBFirewallInit( MB_RTU, MB_UART_INPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, MB_UART_OUTPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, firewall_rule);
+    eStatus = eMBFirewallInit( MB_RTU, MB_UART_INPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, MB_UART_OUTPUT_NUM, MB_DEV_SPEED, MB_PAR_NONE, mb_firewall_cb);
 
     sei(  );
 

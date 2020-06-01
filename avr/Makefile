@@ -97,6 +97,12 @@ SRC = 		modbus/mb_f.c \
 			port/portevent_f.c \
 			port/porttimer_f.c \
 			port/mbcrc.c \
+			firewall/firewall.c \
+			firewall/coils.c \
+			firewall/discrete.c \
+			firewall/holdings.c \
+			firewall/inputs.c \
+			firewall/generated.c
 			
 
 
@@ -132,7 +138,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = port modbus/include modbus/rtu modbus/ascii modbus/tcp
+EXTRAINCDIRS = port modbus/include modbus/rtu modbus/ascii modbus/tcp firewall/include firewall
 
 
 # Compiler flag to set the C Standard level.
