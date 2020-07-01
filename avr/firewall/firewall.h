@@ -77,7 +77,7 @@ typedef struct mb_firewall_func {
  *
  */
 typedef enum mb_firewall_rule_type {
-    MB_FIREWALL_RULE_FIXED,
+    MB_FIREWALL_RULE_FIXED = 1,
     MB_FIREWALL_RULE_REG_INTERVAL,
     MB_FIREWALL_RULE_REG_DATA_INTERVAL
 } mb_firewall_rule_type_t;

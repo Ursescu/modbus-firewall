@@ -47,7 +47,7 @@ typedef enum mb_firewall_data_type {
 /* Defines and typedefs for the firewall rule system */
 #define MB_FIREWALL_MAX_ADDRS 32
 
-#define MB_FIREWALL_MAX_RULES 64
+#define MB_FIREWALL_MAX_RULES 128
 
 typedef enum mb_firewall_policy {
     MB_FIREWALL_WHITELIST = 0,
@@ -75,7 +75,7 @@ typedef struct mb_firewall_func {
  *
  */
 typedef enum mb_firewall_rule_type {
-    MB_FIREWALL_RULE_FIXED,
+    MB_FIREWALL_RULE_FIXED = 1,
     MB_FIREWALL_RULE_REG_INTERVAL,
     MB_FIREWALL_RULE_REG_DATA_INTERVAL
 } mb_firewall_rule_type_t;
